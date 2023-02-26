@@ -118,12 +118,30 @@ Cell* searchList(List* L, char* str) {
 	return NULL;
 }
 
-/*Retourne un pointeur sur une liste lue à partir d'une chaine de caractere (avec le separateur '|'*/
+/*Retourne un pointeur sur une liste lue à partir d'une chaine de caractere (avec le separateur '|')*/
 List* stol(char* s) {
 	/*Initialisation des variables*/
 	List* res = initList();
 	Cell* cell = NULL;
-	char buffer[256] = "";
+	int taille = strlen(s) + 1;
+	char *buffer = (char*) malloc(sizeof(char) * taille);
+
+	if (buffer == NULL) {
+		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres (buffer) pour la fonction stol !\n");
+
+		exit(1);
+	}
+
+	char *save = (char*) malloc(sizeof(char) * taille);
+
+	if (save == NULL) {
+		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres (save) pour la fonction stol !\n");
+
+		free(buffer);
+		exit(1);
+	}
+
+	memset(buffer, 0, taille);
 	int i = 0;
 
 	/*Parcours de l'entierete de la chaine de caracteres*/
@@ -132,14 +150,17 @@ List* stol(char* s) {
 		if (s[i++] == '|') {
 			cell = buildCell(buffer);
 			insertFirst(res, cell);
-			sprintf(buffer, "");
+			memset(buffer, 0, taille);
 		}
 		/*Sinon on sauvegarde le caractere*/
 		else {
-			sprintf(buffer, "%s%c", buffer, s[i - 1]);
+			strcpy(save, buffer);
+			sprintf(buffer, "%s%c", save, s[i - 1]);
 		}
 	}
 	
+	free(buffer);
+	free(save);
 	return res;
 }
 
@@ -185,4 +206,43 @@ List* ftol(char* path) {
 	fclose(f);
 
 	return liste;	
+}
+
+/*Libere une cellule*/
+void freeCell(Cell* cell) {
+	/*Liberation de la chaine de caracteres contenue dans le champs 'date' de la structure*/
+	free(cell -> date);
+
+	/*Liberation de la cellule*/
+	free(cell);
+
+	return;
+}
+
+/*Libere une liste de cellule*/
+void freeList(List* list) {
+	/*Initialisation des variables*/
+	List tmp = *list, suiv;
+
+	/*Parcours de la liste et liberation des cellules croisees*/
+	while (tmp != NULL) {
+		suiv = tmp -> next;
+		freeCell(tmp);
+		tmp = suiv;
+	}
+
+	return;
+}
+
+/*Affiche la liste*/
+void afficheList(List* list) {
+	/*Initialisation de la variable*/
+	List tmp = *list;
+
+	/*Parcours de la liste et affichage des champs 'date' des cellules croisees*/
+	while (tmp != NULL) {
+		printf("%s\n", tmp -> date);
+	}
+
+	return;
 }
