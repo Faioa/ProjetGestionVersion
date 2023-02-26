@@ -32,4 +32,10 @@ void ltof(List* L, char* path);
 
 List* ftol(char* path);
 
+void freeCell(Cell* cell);
+
+void freeList(List* list);
+
+void afficheList(List* list);
+
 #endif
