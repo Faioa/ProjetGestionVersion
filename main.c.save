@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include "list_str.h"
+#include "list_dir.h"
+
+
+/*Renvoie une chaine de caracteres contenant le has du contenu du fichier passe en parametre*/
+char* sha256file(char* file){
+	/*Initialisation et declaration des variables*/
+	static char template [] = "/tmp/myfileXXXXXX";
+
+	char *buffer = malloc(sizeof(char)*256);
+	char fname [1000], cmd[256];
+
+	/*Sauvegarde du template dans une nouvelle string et creation d'un fichier temporaire cree a partir du template*/
+	strcpy (fname, template);
+	int descripteur = mkstemp(fname);
+
+	if (descripteur == -1) {
+		fprintf(stderr, "Erreur lors de la creation d'un fichier temporaire pour la fonction sha256file !\n");
+		exit(1);
+	}
+
+	//Ecriture dans un buffer de la commande a utiliser pour le hachage
+	sprintf(cmd, "cat %s | sha256sum > %s", file, fname);
+	system(cmd);
+
+	/*Recuperation de la première ligne du fichier temporaire (la commande de hash renvoie de toute façon une unique ligne si un seul fichier est renseigne)*/
+	if (read(descripteur, buffer, 256) == -1) {
+		fprintf(stderr, "Erreur lors de la lecture du fichier temporaire %s de la fonction sha256file !\n", fname);
+		exit(1);
+	}
+
+	sprintf(cmd, "rm %s", fname);
+	system(cmd);
+
+	return buffer;
+}
+
+/*Hash le contenu du fichier 'source' et l'ecrit dans le fichier 'dest'*/
+int hashFile(char* source, char* dest){
+	/*Initialisation du buffer*/
+	char cmd[256];
+
+	/*Ecrture dans le buffer de la commande a utiliser pour le hachage*/
+	sprintf(cmd, "cat %s | sha256sum > %s", source, dest);
+	
+	return system(cmd);
+}
+
+int main(){
+
+	//hashFile("main.c", "files.tmp");
+	printf("%s", sha256file("main.c"));
+	blobFile("main.c");
+
+	return 0;
+}
