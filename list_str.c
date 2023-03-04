@@ -10,6 +10,7 @@ List* initList() {
 		fprintf(stderr, "Erreur lors de l'allocation d'une List pour la fonction initList !\n");
 		exit(1);
 	}
+	*res=NULL;
 	
 	return res;
 }
