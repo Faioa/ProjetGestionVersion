@@ -22,8 +22,6 @@ char* hashToPath(char* hash);
 
 void blobFile(char* file);
 
-char* absolutePath(char* path);
-
 char* dirName(char* path);
 
 char* baseName(char* path);
