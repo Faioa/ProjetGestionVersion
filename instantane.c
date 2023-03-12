@@ -1,6 +1,6 @@
 #include "instantane.h"
 
-/*Renvoie une chaine de caracteres contenant le has du contenu du fichier passe en parametre*/
+/*Renvoie une chaine de caracteres contenant le hash du contenu du fichier passe en parametre*/
 char* sha256file(char* file){
 	/*Initialisation et declaration des variables*/
 	static char template [] = "/tmp/myfileXXXXXX";
@@ -92,6 +92,8 @@ List* listdir(char* root_dir) {
 
 	return list;
 }
+
+//UTILISER SYS/STAT.H POUR REFAIRE / FAIRE FILE_EXISTS ET IS_FILE
 
 /*Renvoie 1 si le fichier passe en parametre existe dans le repertoire courant, 0 sinon*/
 int file_exists(char* file) {
