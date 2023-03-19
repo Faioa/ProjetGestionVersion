@@ -8,7 +8,6 @@
 #include "workfile.h"
 
 
-
 typedef struct {
 	WorkFile* tab;
 	int size;
@@ -16,11 +15,9 @@ typedef struct {
 } WorkTree;
 
 
-
-
-
-
 WorkTree* initWorkTree();
+
+void freeWorkTree(WorkTree* wt);
 
 int inWorkTree(WorkTree* wt, char* name);
 

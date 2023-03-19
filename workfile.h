@@ -5,27 +5,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 typedef struct {
 	char * name;
 	char * hash;
 	int mode;
-} Workfile;
-
-
+} WorkFile;
 
 
 WorkFile* createWorkFile(char* name);
+
+void freeWorkFile(WorkFile* w);
  
 char* wfts(WorkFile* wf);
 
 WorkFile* stwf(char* ch);
-
-
-
-
-
-
-
-
 
 #endif
