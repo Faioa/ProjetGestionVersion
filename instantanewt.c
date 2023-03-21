@@ -126,7 +126,7 @@ void restoreWorkTree(WorkTree* wt, char* path){
 				freeWorkFile(wf);
 			}
 			char newpath[256];
-			strcpy(newpath,path)
+			strcpy(newpath,path);
 			strcat(newpath,"/");
 			strcat(newpath,WF->name);
 			restoreWorkTree(newWt,newpath);
