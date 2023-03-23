@@ -64,7 +64,7 @@ char* blobWorkTree(WorkTree* wt){
 }
 
 /*Creer recursivement tous les instantanes du WorkTree et enfin l'instantane de celui-ci*/
-char * saveWorkTree(WorkTree* wt, char* path){
+/*char * saveWorkTree(WorkTree* wt, char* path){
 	//cette fonction est probablement incorrecte
 	for(int i=0;i<wt->n;i++){
 		WorkFile * WF=wt->tab[i];
@@ -137,4 +137,4 @@ void restoreWorkTree(WorkTree* wt, char* path){
 
 
 
-}
+}*/
