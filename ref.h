@@ -17,6 +17,6 @@ char* getRef(char* ref_name);
 
 void myGitAdd(char* file_or_folder);
 
-void myGitCommit(char* branch name, char* message);
+void myGitCommit(char* branch_name, char* message);
 
 #endif

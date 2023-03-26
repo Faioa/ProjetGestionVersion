@@ -7,7 +7,7 @@ PROGRAMS = exec
 
 all: $(PROGRAMS)
 
-exec: main.c list_utility.o instantane.o file_utility.o hash_utility.o instantanewt.o workfile.o worktree.o instantane.h list_utility.h file_utility.h hash_utility.h instantanewt.h workfile.h worktree.h
+exec: main.c list_utility.o instantane.o file_utility.o hash_utility.o instantanewt.o workfile.o worktree.o ref.o commit.o instantane.h list_utility.h file_utility.h hash_utility.h instantanewt.h workfile.h worktree.h ref.h commit.h
 	$(CC) -o $@ $(CFLAGS) $^
 
 list_utility.o: list_utility.c list_utility.h
@@ -30,6 +30,12 @@ workfile.o: workfile.c workfile.h
 
 worktree.o: worktree.c worktree.h workfile.h
 	$(CC) -c worktree.c $(CFLAGS)
+
+ref.o: ref.c ref.h worktree.h file_utility.h
+	$(CC) -c ref.c $(CFLAGS)
+
+commit.o: commit.c commit.h
+	$(CC) -c commit.c $(CFLAGS)
 
 #Ou plus simplement
 #%.o:%.c %.h
