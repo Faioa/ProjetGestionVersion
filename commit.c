@@ -3,13 +3,13 @@
 kvp* createKeyVal(char* key, char* val){
 	kvp* k=malloc(sizeof(kvp));
 	k->key=strdup(key);
-	k->val=strdup(val);
+	k->value=strdup(val);
 	return k;
 }
 
 void freeKeyVal(kvp* kv){
 	free(kv->key);
-	free(kv->val);
+	free(kv->value);
 	free(kv);
 }
 
@@ -21,7 +21,7 @@ char* kvts(kvp* k){
 		exit(1);
 	}
 	memset(buffer, 0, taille);
-	sprintf(buffer,"%s :%s",k->key,k->val);
+	sprintf(buffer,"%s :%s",k->key,k->value);
 	return buffer;
 }
 
@@ -40,11 +40,11 @@ kvp* stkv(char* str){
 }
 
 Commit* initCommit(){
-	Commit*c=maloc(sizeof(Commit));
+	Commit*c=malloc(sizeof(Commit));
 	c->size=TAILLE_C;
-	C->n=0;
+	c->n=0;
 	c->T=malloc(sizeof(kvp*)*TAILLE_C);
-	memset(c->T, NULL, TAILLE_C);
+	memset(c->T, 0, TAILLE_C);
 	return c;
 }
 
@@ -52,7 +52,7 @@ unsigned long hash(unsigned char *str){
     unsigned long hash = 5381;
     int c;
 
-    while (c = *str++)
+    while ((c = (*str)++) != 0)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
     return hash;
@@ -62,7 +62,7 @@ void commitSet(Commit* c, char* key, char* value){
 
 	kvp*k=createKeyVal(key,value);
 	
-	int pos=hash(key), i;
+	int pos=hash((unsigned char *)key), i;
 	
 	for(i=0;i<c->size;i++){
 		if(c->T[((pos+i)%c->size)]==NULL){
@@ -82,7 +82,7 @@ char* commitGet(Commit* c, char* key){
 		return NULL;
 	//parcours du tableau pour chercher la clé
 	for(int i=0;i<c->n;i++){
-		if(strcmp(c->T[i]->key,key)==0)return c->T[i]->val;
+		if(strcmp(c->T[i]->key,key)==0)return c->T[i]->value;
 	}
 	return NULL;
 
@@ -109,7 +109,7 @@ char* cts(Commit* c){
 	
 	/*Parcours des elements et ajouts de la representation a la suite du buffer*/
 	for(int i = 0; i < c -> n; i++){
-		strcat(buffer,kvts((c->tab) + i));
+		strcat(buffer,kvts((c->T)[i]));
 		strcat(buffer,"\n");
 	}
 	
@@ -146,9 +146,9 @@ Commit* stc(char* ch){
 		/*Si on rencontre le separateur '\n' on creer une cellule avec ce qu'on à lu jusqu'a maintenant et on l'insere dans la liste*/
 		if (ch[i++] == '\n') {
 			k=stkv(buffer);
-			commitSet(c,k->key,k->val);
+			commitSet(c,k->key,k->value);
 			free(k->key);
-			free(k->val);
+			free(k->value);
 			free(k);
 			/*Reinitialisation du buffer*/
 			memset(buffer, 0, taille);
@@ -181,7 +181,7 @@ void ctf(Commit* c, char* file){
 	fclose(f);
 	free(buffer);
 
-	return 0;
+	return ;
 }
 
 Commit* ftc(char* file){
@@ -199,13 +199,13 @@ Commit* ftc(char* file){
 	/*Lecture du fichier et traitement des donnees*/
 	while(fgets(buffer, 256, f)){
 		k = stkv(buffer);
-		commitSet(c,k->key,k->val);
+		commitSet(c,k->key,k->value);
 		freeKeyVal(k);
 	}
 	
 	fclose(f);
 
-	return wt;
+	return c;
 	
 
 }
@@ -215,7 +215,7 @@ char* blobCommit(Commit* c){
 	static char template [] = "/tmp/myfileXXXXXX";
 
 	int sortie;
-	char fname[1000], cmd[1000+TAILLE_MAX], *buffer = (char*) malloc(sizeof(char) * 256), *com;
+	char fname[1000], cmd[1000+TAILLE_C], *buffer = (char*) malloc(sizeof(char) * 256), *com;
 	;
 
 	if (buffer == NULL) {
@@ -271,15 +271,7 @@ char* blobCommit(Commit* c){
 	return buffer;
 	
 	
-	if (sortie == 0) {
-		buffer[0] = '\0';
-	}
-
-	sprintf(cmd, "rm %s", fname);
-	system(cmd);
-	free(wtree);
-
-	return buffer;
+	
 }
 
 
