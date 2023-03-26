@@ -134,7 +134,6 @@ int menu(void) {
 
 			/*Si on continue c'est que la donnee est egale a -1 ou est incorrecte*/
 			continue;
-
 		}
 	}
 

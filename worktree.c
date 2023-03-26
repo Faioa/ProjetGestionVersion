@@ -50,7 +50,7 @@ int inWorkTree(WorkTree* wt, char* name){
 
 /*Ajoute un element au WorkTree si il n'y est pas deja*/
 int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode){
-	if (inWorkTree(wt,name) == -1){
+	if (inWorkTree(wt,name) == -1 && wt -> n < wt -> size){
 		WorkFile* wf = createWorkFile(name);
 
 		wf -> hash = strdup(hash);
