@@ -1,5 +1,5 @@
 #include "ref.h"
-
+#include "file_utility.h"
 void initRefs(){
 	char cmd[256];
 	sprintf(cmd,"mkdir -p .refs && touch .refs/{master,HEAD}");
@@ -22,4 +22,15 @@ void deleteRef(char* ref_name){
 	system(cmd);
 	
 	free(name);
+}
+char* getRef(char* ref_name){
+	if(file_exists(ref_name)==0)return NULL;
+
+	char*buffer=malloc(sizeof(char)*256);
+
+	char cmd[256];
+	sprintf(cmd,"cat %s > %s",ref_name,buffer);
+	system(cmd);
+
+	return buffer;
 }
