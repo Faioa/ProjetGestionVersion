@@ -268,10 +268,7 @@ char* blobCommit(Commit* c){
 	system(cmd);
 	free(com);
 
-	return buffer;
-	
-	
-	
+	return buffer;	
 }
 
 

@@ -16,7 +16,7 @@ List* initList() {
 	return res;
 }
 
-/*Construit une cellule et initialise son champs 'date' avec la chaine de caracteres passee en parametre*/
+/*Construit une cellule et initialise son champs 'data' avec la chaine de caracteres passee en parametre*/
 Cell* buildCell(char* ch) {
 	/*Initialisation de la variable et allocation*/
 	Cell* res = (Cell*) malloc(sizeof(Cell));
@@ -27,7 +27,7 @@ Cell* buildCell(char* ch) {
 	}
 	
 	/*Remplissage des champs de la cellule*/
-	res -> date = strdup(ch);
+	res -> data = strdup(ch);
 	res -> next = NULL;
 	
 	return res;
@@ -42,13 +42,13 @@ void insertFirst(List* L, Cell* C) {
 	return;
 }
 
-/*Retourne le champs 'date' d'une cellule passee en parametre*/
+/*Retourne le champs 'data' d'une cellule passee en parametre*/
 char* ctos(Cell* c) {
 
-	return c -> date;
+	return c -> data;
 }
 
-/*Retoune une chaine de caractere contenant tous les champs 'date' des cellules de la liste avec '|' comme separateur*/
+/*Retoune une chaine de caractere contenant tous les champs 'data' des cellules de la liste avec '|' comme separateur*/
 char* ltos(List* L) {
 	/*Initialisation et declaration des variables*/
 	char* res;
@@ -57,7 +57,7 @@ char* ltos(List* L) {
 
 	/*Premier parcours de la liste pour recuperer la taille de la zone memoire a allouer (+1 pour '\0'*/
 	while (tmp != NULL) {
-		taille += strlen(tmp -> date);
+		taille += strlen(tmp -> data);
 		if (tmp -> next != NULL) {
 			taille ++;
 		}
@@ -77,9 +77,9 @@ char* ltos(List* L) {
 	}
 	tmp = *L;
 
-	/*Second parcours de la liste pour recuperer les champs 'date'*/
+	/*Second parcours de la liste pour recuperer les champs 'data'*/
 	while (tmp != NULL) {
-		strcat(res, tmp -> date);
+		strcat(res, tmp -> data);
 		if(tmp -> next != NULL) {
 			strcat(res, "|");
 		}
@@ -89,7 +89,7 @@ char* ltos(List* L) {
 	return res;
 }
 
-/*Retourne le champ 'date' de la i-ieme cellule de la liste si cette cellule existe, NULL sinon*/
+/*Retourne le champ 'data' de la i-ieme cellule de la liste si cette cellule existe, NULL sinon*/
 Cell* listGet(List* L, int i) {
 	/*Initialisation et déclaration des variables*/
 	int j = 0;
@@ -104,14 +104,14 @@ Cell* listGet(List* L, int i) {
 	return tmp;
 }
 
-/*Retourne un pointeur sur la cellule dont le champ 'date' est egal au parametre str si elle existe, NULL sinon*/
+/*Retourne un pointeur sur la cellule dont le champ 'data' est egal au parametre str si elle existe, NULL sinon*/
 Cell* searchList(List* L, char* str) {
 	/*Initialisation de la variable*/
 	List tmp = *L;
 
 	/*Parcous de la liste jusqu'a trouver l'element ou atteindre la fin de la liste*/
 	while (tmp != NULL) {
-		if (strcmp(tmp -> date, str) == 0) {
+		if (strcmp(tmp -> data, str) == 0) {
 			return tmp;
 		}
 		tmp = tmp -> next;
@@ -212,8 +212,8 @@ List* ftol(char* path) {
 
 /*Libere une cellule*/
 void freeCell(Cell* cell) {
-	/*Liberation de la chaine de caracteres contenue dans le champs 'date' de la structure*/
-	free(cell -> date);
+	/*Liberation de la chaine de caracteres contenue dans le champs 'data' de la structure*/
+	free(cell -> data);
 
 	/*Liberation de la cellule*/
 	free(cell);
@@ -241,9 +241,9 @@ void afficheList(List* list) {
 	/*Initialisation de la variable*/
 	List tmp = *list;
 
-	/*Parcours de la liste et affichage des champs 'date' des cellules croisees*/
+	/*Parcours de la liste et affichage des champs 'data' des cellules croisees*/
 	while (tmp != NULL) {
-		printf("%s\n", tmp -> date);
+		printf("%s\n", tmp -> data);
 	}
 
 	return;

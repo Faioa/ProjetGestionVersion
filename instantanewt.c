@@ -106,7 +106,7 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 
 			/*On reconstruit le worktree*/
 			while ((*l) != NULL) {
-				appendWorkTree(wtree, (*l) -> date, NULL, 0);
+				appendWorkTree(wtree, (*l) -> data, NULL, 0);
 			}
 
 			/*On construit le path du nouveau WorkTree*/

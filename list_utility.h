@@ -7,7 +7,7 @@
 
 
 typedef struct cell {
-	char* date;
+	char* data;
 	struct cell* next;
 }Cell;
 
