@@ -8,9 +8,16 @@ void initBranch(){
 }
 
 int branchExists(char * branch){
-	List*refs=listdir(branch);
-	
-	return searchList(refs,branch) != NULL;
+	int res = 0;
+
+	List*refs=listdir(".refs");
+
+	if (searchList(refs,branch) != NULL) {
+		res = 1;
+	}
+
+	freeList(refs);
+	return res;
 }
 void createBranch(char * branch){
 	char *hash=getRef("HEAD");
