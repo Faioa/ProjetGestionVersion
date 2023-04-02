@@ -26,13 +26,13 @@ void createBranch(char * branch){
 }
 char * getCurrentBranch(){
 	FILE*f=fopen(".current_branch","r");
-	char*buff=malloc(sizeof(char)*100);
+	char*buff=malloc(sizeof(char)*1000);
 	fscanf(f,"%s",buff);
 	return buff;
 }
 
 char *hashToPathCommit(char * hash){
-	char * buff=malloc(sizeof(char)*100);
+	char * buff=malloc(sizeof(char)*1000);
 	sprintf(buff,"%s.c",hashToPath(hash));
 	return buff;
 }
@@ -72,4 +72,27 @@ List * branchList(char * branch){
 		}
 	}
 	return l;
+}
+
+List * getAllCommits(){
+	List*result=initList();
+	List*all=listdir(".refs");
+	Cell*cellule=*all;
+	while (cellule != NULL){
+		if(cellule->data=".")continue;
+
+		List*br_list=branchList(cellule->data);
+
+		Cell*cell2=*br_list;
+		while(cell2 != NULL){
+			if(searchList(result,cell2->data) == NULL){
+				insertFirst(result,buildCell(cell2->data));
+			}
+			cell2=cell2->next;
+		}
+		freeList(br_list);
+		cellule=cellule->next;
+	}
+	freeList(all);
+	return result;
 }

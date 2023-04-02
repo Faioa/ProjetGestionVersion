@@ -46,6 +46,11 @@ void ctf(Commit* c, char* file);
 
 Commit* ftc(char* file);
 
+void free_kvp(kvp *k);
+
+void freeCommit(Commit *c);
+
+
 char* blobCommit(Commit* c);
 
 #endif

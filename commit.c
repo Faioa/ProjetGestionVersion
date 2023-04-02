@@ -271,6 +271,19 @@ char* blobCommit(Commit* c){
 	return buffer;	
 }
 
+void free_kvp(kvp *k){
+	free(k->key);
+	free(k->value);
+	free(k);
+}
+
+void freeCommit(Commit *c){
+	for(int i=0;i<c->n;i++){
+		free_kvp(c->T[i]);
+	}
+	free(c);
+}
+
 
 
 
