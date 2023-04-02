@@ -64,8 +64,12 @@ List * branchList(char * branch){
 	while( c != NULL ){
 		Cell*cellule=buildCell(commit_hash);
 		insertFirst(l,cellule);
-		commit_hash=commitGet(c,"predecessor");
-		c=ftc(hashToPathCommit(commit_hash));
+		if(commitGet(c,"predecessor") != NULL){
+			commit_hash=commitGet(c,"predecessor");
+			c=ftc(hashToPathCommit(commit_hash));
+		}else{
+			c=NULL;
+		}
 	}
 	return l;
 }
