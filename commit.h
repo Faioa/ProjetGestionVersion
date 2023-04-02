@@ -44,6 +44,8 @@ Commit* stc(char* ch);
 
 void ctf(Commit* c, char* file);
 
+Commit* ftc(char* file);
+
 char* blobCommit(Commit* c);
 
 #endif

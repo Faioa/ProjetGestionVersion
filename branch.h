@@ -17,6 +17,8 @@ void createBranch(char* branch);
 
 char* getCurrentBranch();
 
+char *hashToPathCommit(char * hash);
+
 void printBranch(char* branch);
 
 List* branchList(char* branch);
