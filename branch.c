@@ -26,13 +26,13 @@ void createBranch(char * branch){
 }
 char * getCurrentBranch(){
 	FILE*f=fopen(".current_branch","r");
-	char*buff=malloc(sizeof(char)*100);
+	char*buff=malloc(sizeof(char)*1000);
 	fscanf(f,"%s",buff);
 	return buff;
 }
 
 char *hashToPathCommit(char * hash){
-	char * buff=malloc(sizeof(char)*100);
+	char * buff=malloc(sizeof(char)*1000);
 	sprintf(buff,"%s.c",hashToPath(hash));
 	return buff;
 }
@@ -57,7 +57,7 @@ void printBranch(char* branch){
 	}
 }
 
-List * branchList(char * branch){
+List* branchList(char * branch){
 	List*l=initList();
 	char * commit_hash=getRef(branch);
 	Commit * c=ftc(hashToPathCommit(commit_hash));
@@ -72,4 +72,8 @@ List * branchList(char * branch){
 		}
 	}
 	return l;
+}
+
+List* getAllCommits() {
+
 }
