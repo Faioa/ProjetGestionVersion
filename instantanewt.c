@@ -99,14 +99,14 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 		}
 
 		/*Si la cible est un repertoire*/
-		else if (is_directory(wf -> name ) == 0) {
+		else if (is_directory(wf -> name) == 0) {
 			/*On recupere les noms des fichiers*/
 			l = listdir(wf -> name);
 			wtree = initWorkTree();
 
 			/*On reconstruit le worktree*/
 			while ((*l) != NULL) {
-				appendWorkTree(wtree, (*l) -> date, NULL, 0);
+				appendWorkTree(wtree, (*l) -> data, NULL, 0);
 			}
 
 			/*On construit le path du nouveau WorkTree*/
