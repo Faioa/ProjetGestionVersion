@@ -26,3 +26,17 @@ List* branchList(char* branch);
 List* getAllCommits();
 
 #endif
+
+
+/*List * branchList(char * branch){
+	List*l=initList();
+	char * commit_hash=getRef(branch);
+	Commit * c=ftc(hashToPathCommit(commit_hash));
+	while( c != NULL ){
+		Cell*cellule=buildCell(commit_hash);
+		insertFirst(l,cellule);
+		commit_hash=commitGet(c,"predecessor");
+		c=ftc(hashToPathCommit(commit_hash));
+	}
+	return l;
+}*/

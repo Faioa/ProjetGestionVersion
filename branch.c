@@ -8,7 +8,7 @@ void initBranch(){
 }
 
 int branchExists(char * branch){
-	List*refs=listdir(branch);
+	List*refs=listdir(".refs");
 	
 	return searchList(refs,branch) != NULL;
 }
@@ -47,4 +47,17 @@ void printBranch(char* branch){
 			c=NULL;
 		}
 	}
+}
+
+List * branchList(char * branch){
+	List*l=initList();
+	char * commit_hash=getRef(branch);
+	Commit * c=ftc(hashToPathCommit(commit_hash));
+	while( c != NULL ){
+		Cell*cellule=buildCell(commit_hash);
+		insertFirst(l,cellule);
+		commit_hash=commitGet(c,"predecessor");
+		c=ftc(hashToPathCommit(commit_hash));
+	}
+	return l;
 }
