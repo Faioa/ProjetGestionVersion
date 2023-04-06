@@ -1,5 +1,6 @@
 #include "ref.h"
-#include "file_utility.h"
+
+
 void initRefs(){
 	char cmd[256];
 	sprintf(cmd,"mkdir -p .refs && touch .refs/{master,HEAD}");

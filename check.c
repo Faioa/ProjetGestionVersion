@@ -4,13 +4,14 @@ void restoreCommit(char *hash_commit){
     char buffer[1000];
     char*path=hashToPathCommit(hash_commit);
     Commit*c=ftc(path);
-    char tab[256]=commitGet(c,"tree");
-    sprintf(buff,"%s.t",hashToPath(tab));
+    char* tab=commitGet(c,"tree");
+    sprintf(buffer,"%s.t",hashToPath(tab));
 	WorkTree*wt=ftwt(buffer);
     restoreWorkTree(wt,".");
     free(path);
     freeWorkTree(wt);
     freeCommit(c);
+    free(tab);
 }
 
 void myGitCheckoutBranch(char * branch){

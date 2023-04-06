@@ -6,6 +6,11 @@
 #include <string.h>
 #include "worktree.h"
 #include "file_utility.h"
+#include "hash_utility.h"
+#include "instantanewt.h"
+#include "worktree.h"
+#include "commit.h"
+
 
 void initRefs();
 

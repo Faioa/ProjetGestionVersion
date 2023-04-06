@@ -2,12 +2,12 @@
 #include "file_utility.h"
 
 void initBranch(){
-	FILE*F=fopen(".current_branch","w");
+	FILE*f=fopen(".current_branch","w");
 	fputs("master",f);
 	fclose(f);
 }
 
-int branchExists(char * branch){
+int branchExists(char* branch){
 	int res = 0;
 
 	List*refs=listdir(".refs");
@@ -20,7 +20,7 @@ int branchExists(char * branch){
 	return res;
 }
 
-void createBranch(char * branch){
+void createBranch(char* branch){
 	char *hash=getRef("HEAD");
 	createUpdateRef(branch,hash);
 }
@@ -31,7 +31,7 @@ char * getCurrentBranch(){
 	return buff;
 }
 
-char *hashToPathCommit(char * hash){
+char *hashToPathCommit(char* hash){
 	char * buff=malloc(sizeof(char)*1000);
 	sprintf(buff,"%s.c",hashToPath(hash));
 	return buff;
@@ -57,7 +57,7 @@ void printBranch(char* branch){
 	}
 }
 
-List* branchList(char * branch){
+List* branchList(char* branch){
 	List*l=initList();
 	char * commit_hash=getRef(branch);
 	Commit * c=ftc(hashToPathCommit(commit_hash));
@@ -74,13 +74,12 @@ List* branchList(char * branch){
 	return l;
 }
 
-<<<<<<< HEAD
 List * getAllCommits(){
 	List*result=initList();
 	List*all=listdir(".refs");
 	Cell*cellule=*all;
 	while (cellule != NULL){
-		if(cellule->data=".")continue;
+		if(*(cellule->data)=='.')continue;
 
 		List*br_list=branchList(cellule->data);
 
@@ -97,8 +96,3 @@ List * getAllCommits(){
 	freeList(all);
 	return result;
 }
-=======
-List* getAllCommits() {
-
-}
->>>>>>> 6d95fe6213f29fa9bec636b42f1cc6a19f0fd107

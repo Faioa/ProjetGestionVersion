@@ -10,7 +10,7 @@
 #include "branch.h"
 #include "hash_utility.h"
 
-void restoreCommit(char* hash commit);
+void restoreCommit(char* hash_commit);
 
 void myGitCheckoutBranch(char* branch);
 
