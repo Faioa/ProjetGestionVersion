@@ -77,6 +77,12 @@ void commitSet(Commit* c, char* key, char* value){
 
 }
 
+Commit* createCommit(char* hash){
+	Commit * c=initCommit();
+	commitSet(c,"tree",hash);
+	return c;
+}
+
 char* commitGet(Commit* c, char* key){
 	if (c == NULL)
 		return NULL;

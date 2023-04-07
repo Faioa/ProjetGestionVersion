@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "check.h"
 #include "ref.h"
 #include "commit.h"
 #include "worktree.h"
