@@ -24,3 +24,19 @@ WorkTree* mergeWorkTrees(WorkTree* wt1, WorkTree* wt2, List** conflicts){
     return wt;
 
 }
+List* merge(char* remote_branch,char* message){
+    char*current_branch=getCurrentBranch()
+    WorkTree*wt1=ftwt(current_branch);
+    WorkTree*wt2=ftwt(remote_branch);
+    List*conflicts=initList();
+
+    WorkTree*wt=mergeWorkTrees(wt1,wt2,&conflicts);
+
+    
+
+
+
+
+
+    return NULL;
+}
