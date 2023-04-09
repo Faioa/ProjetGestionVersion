@@ -4,7 +4,7 @@
 /*Renvoie un WorkFile initialiser avec ses champs vides*/
 WorkFile* createWorkFile(char * name){
 	/*Allocation de la memoire pour la structure*/
-	WorkFile * w = malloc(sizeof(WorkFile));
+	WorkFile* w = malloc(sizeof(WorkFile));
 	if (w == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'un workfile pour la fonction createWorkFile !\n");
 		exit(1);
@@ -23,11 +23,14 @@ WorkFile* createWorkFile(char * name){
 /*Libere un la memoire utilisee par un workfile*/
 void freeWorkFile(WorkFile* w) {
 	if (w != NULL) {
-		free(w -> name);
+		if (w -> name != NULL) {
+			free(w -> name);
+		}
 
 		if (w -> hash != NULL) {
 			free(w -> hash);
 		}
+
 		free(w);
 	}
 }

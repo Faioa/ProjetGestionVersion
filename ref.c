@@ -27,6 +27,7 @@ void deleteRef(char* ref_name){
 char* getRef(char* ref_name){
 	
 	char*result=malloc(sizeof(char)*256);
+	memset(result, 0, 256);
 	
 	char buffer[256];
 	
@@ -50,7 +51,7 @@ char* getRef(char* ref_name){
 
 void myGitAdd(char* file_or_folder){
 
-	if (file_exists(".add")) {
+	if (! file_exists(".add")) {
 		system("touch .add");
 	}
 	
@@ -60,7 +61,8 @@ void myGitAdd(char* file_or_folder){
 		appendWorkTree(wt,file_or_folder,NULL,0);
 		wttf(wt, ".add");
 	}
-		
+
+	freeWorkTree(wt);
 }
 
 

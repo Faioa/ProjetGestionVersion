@@ -233,6 +233,8 @@ void freeList(List* list) {
 		tmp = suiv;
 	}
 
+	free(list);
+
 	return;
 }
 

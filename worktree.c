@@ -10,6 +10,10 @@ WorkTree* initWorkTree(){
 		exit(1);
 	}
 
+	/*Initialisation des champs*/
+	wt->size=TAILLE_MAX;
+	wt->n=0;
+
 	wt -> tab = malloc(sizeof(WorkFile) * TAILLE_MAX);
 	if (wt -> tab == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation du tableau d'un WorkTree pour la fonction initWorkTree !\n");
@@ -17,32 +21,36 @@ WorkTree* initWorkTree(){
 		exit(1);
 	}
 
-	/*Initialisation des autres variables*/
-	wt->size=TAILLE_MAX;
-	wt->n=0;
+	for(int i = 0; i < wt -> size; i++) {
+		(wt -> tab[i]).name = NULL;
+		(wt -> tab[i]).hash = NULL;
+		(wt -> tab[i]).mode = 0;
+	}
 
 	return wt;
 }
 
 /*Libere la memoire allouee a un WorkTree*/
 void freeWorkTree(WorkTree* wt) {
-	int i;
+	for (int i = 0; i < wt -> n; i++) {
+		if ((wt->tab+i)->name != NULL) {
+			free((wt->tab+i)->name);
+		}
 
-	for (i = 0; i < wt -> n; i++) {
-		freeWorkFile((wt -> tab) + i);
+		if ((wt->tab+i)->hash != NULL) {
+			free((wt->tab+i)->hash);
+		}
 	}
-
+	free(wt -> tab);
 	free(wt);
 }
 
 /*Verifie si le fichier ou le repertoire passe en parametre existe dans le WorkTree. Renvoie la position de la cible si elle est trouvee et -1 sinon*/
 int inWorkTree(WorkTree* wt, char* name){
 	for (int i = 0; i< wt -> n; i++) {
-
-		if (strcmp(((wt -> tab)[i]).name, name) == 0) {
+		if (((wt -> tab)[i]).name != NULL && strcmp(((wt -> tab)[i]).name, name) == 0) {
 			return i;
 		}
-
 	}
 
 	return -1;
@@ -51,13 +59,11 @@ int inWorkTree(WorkTree* wt, char* name){
 /*Ajoute un element au WorkTree si il n'y est pas deja*/
 int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode){
 	if (inWorkTree(wt,name) == -1 && wt -> n < wt -> size){
-		WorkFile* wf = createWorkFile(name);
+		wt->tab[wt->n].mode = mode;
 
-		wf -> hash = strdup(hash);
-
-		wf -> mode = mode;
-
-		(wt -> tab)[wt -> n] = *wf;
+		if (hash != NULL) {
+			wt->tab[wt->n].hash = strdup(hash);
+		}
 
 		wt -> n = wt -> n + 1;
 
@@ -87,8 +93,10 @@ char* wtts(WorkTree* wt){
 	
 	/*Parcours des elements et ajouts de la representation a la suite du buffer*/
 	for(int i = 0; i < wt -> n; i++){
-		strcat(buffer,wfts((wt->tab) + i));
+		char* swf = wfts((wt->tab) + i);
+		strcat(buffer,swf);
 		strcat(buffer,"\n");
+		free(swf);
 	}
 	
 	return buffer;
