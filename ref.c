@@ -3,7 +3,7 @@
 
 void initRefs(){
 	char cmd[256];
-	sprintf(cmd,"mkdir -p .refs && touch .refs/{master,HEAD}");
+	sprintf(cmd,"mkdir -p .refs && touch .refs/master .refs/HEAD");
 	system(cmd);
 
 }
@@ -66,15 +66,14 @@ void myGitAdd(char* file_or_folder){
 }
 
 
-void myGitCommit(char * branch_name,char * message){
+void myGitCommit(char* branch_name, char * message){
 
-
-	if(file_exists(".refs")){
+	if(is_directory(".refs") != 0){
 		fprintf(stderr,"Initialiser d'abord les références du projet\n");
 		return ;
 	}
 	
-	if(file_exists(branch_name)){
+	if(file_exists(branch_name) != 0){
 		fprintf(stderr,"La branche n'existe pas\n");
 		return ;
 	}
@@ -91,22 +90,31 @@ void myGitCommit(char * branch_name,char * message){
 		free(test2);
 		return ;
 	}
+
+	free(test);
+	free(test2);
 	
 	WorkTree*wt=ftwt(".add");
 	
 	system("rm -f .add");
 	
 	char *hash=saveWorkTree(wt,".");
+
+	freeWorkTree(wt);
 	
 	Commit *c=initCommit();
 	
 	commitSet(c,"tree",hash);
+
+	free(hash);
 	
 	FILE*fp=fopen(branch_name,"r");
+	if (fp == NULL) {
+		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction myGitCommit !\n", branch_name);
+
+	}
 	
 	char result[256];
-
-	
 	
 	
 	if(fgets(result,256,fp)!= NULL && strlen(fgets(result,256,fp))!=0){
@@ -124,16 +132,6 @@ void myGitCommit(char * branch_name,char * message){
 	createUpdateRef("HEAD",hash_commit);
 	
 	
-	
-	
-	free(test);
-	free(test2);
-	
-	
-	
-
-
+	free(hash_commit);
+	freeCommit(c);
 }
-
-
-

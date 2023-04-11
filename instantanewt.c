@@ -52,9 +52,8 @@ char* blobWorkTree(WorkTree* wt){
 
 		exit(1);
 	}
-	if (sortie == 0) {
-		buffer[0] = '\0';
-	}
+
+	printf("%s\n",wtree);
 
 	sprintf(cmd, "rm %s", fname);
 	system(cmd);
@@ -122,7 +121,11 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 		}
 	}
 
-	return blobWorkTree(wt);
+	char* res = blobWorkTree(wt);
+
+	freeWorkTree(wt);
+
+	return res;
 }
 
 /*Restore l'arborescence du WorkTree et les fichiers associes*/

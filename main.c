@@ -71,7 +71,10 @@ int main(int argc, char* argv[]) {
 		printf("Zone de preparation : \n");
 		if (file_exists(".add")) {
 			WorkTree* wt = ftwt(".add");
-			printf("%s\n", wtts(wt));
+			char* swt = wtts(wt);
+			printf("%s\n", swt);
+			freeWorkTree(wt);
+			free(swt);
 		}
 	}
 
@@ -86,7 +89,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (argc > 1 && strcmp(argv[1], "get-current-branch") == 0) {
-		printf ("%s", getCurrentBranch());
+		char* branch = getCurrentBranch();
+		printf ("%s", branch);
+		free(branch);
 	}
 
 	if (argc > 1 && strcmp(argv[1], "branch") == 0) {

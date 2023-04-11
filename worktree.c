@@ -63,6 +63,14 @@ int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode){
 
 		if (hash != NULL) {
 			wt->tab[wt->n].hash = strdup(hash);
+		} else {
+			wt->tab[wt->n].hash = NULL;
+		}
+
+		if (name != NULL) {
+			wt->tab[wt->n].name = strdup(name);
+		} else {
+			wt->tab[wt->n].name = NULL;
 		}
 
 		wt -> n = wt -> n + 1;
