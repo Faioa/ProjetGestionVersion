@@ -26,9 +26,12 @@ void createBranch(char* branch){
 }
 char * getCurrentBranch(){
 	FILE*f=fopen(".current_branch","r");
-	char*buff=malloc(sizeof(char)*1000);
-	fscanf(f,"%s",buff);
-	return buff;
+	if(f != NULL){
+		char*buff=malloc(sizeof(char)*1000);
+		fscanf(f,"%s",buff);
+		return buff;
+	}
+	return NULL;
 }
 
 char *hashToPathCommit(char* hash){

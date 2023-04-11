@@ -90,8 +90,12 @@ int main(int argc, char* argv[]) {
 
 	if (argc > 1 && strcmp(argv[1], "get-current-branch") == 0) {
 		char* branch = getCurrentBranch();
-		printf ("%s", branch);
-		free(branch);
+		if (branch == NULL) {
+			printf("erreur lors de l'ouverture du fichier current_branch");
+		} else {
+			printf("%s", branch);
+			free(branch);
+		}
 	}
 
 	if (argc > 1 && strcmp(argv[1], "branch") == 0) {
