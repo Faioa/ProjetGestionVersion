@@ -48,11 +48,27 @@ void freeWorkTree(WorkTree* wt) {
 /*Verifie si le fichier ou le repertoire passe en parametre existe dans le WorkTree. Renvoie la position de la cible si elle est trouvee et -1 sinon*/
 int inWorkTree(WorkTree* wt, char* name){
 	for (int i = 0; i< wt -> n; i++) {
-		if (((wt -> tab)[i]).name != NULL && strcmp(((wt -> tab)[i]).name, name) == 0) {
+		if (strcmp((wt -> tab[i]).name, name) == 0) {
 			return i;
 		}
 	}
 
+	return -1;
+}
+
+/*Retourne 1 si le fichier est une representation d'un WorkTree, 0 si le fichier existe quand meme et -1 sinon*/
+int isWorkTree(char* hash) {
+	/*Initialisation des variables*/
+	int taille = strlen(hash)+3;
+	char buffer[taille];
+	memset(buffer, 0, taille);
+	sprintf(buffer, "%s.t", hash);
+	if(file_exists(buffer) == 1) {
+		return 1;
+	}
+	else if (file_exists(hash) == 1) {
+		return 0;
+	}
 	return -1;
 }
 
@@ -101,7 +117,7 @@ char* wtts(WorkTree* wt){
 	
 	/*Parcours des elements et ajouts de la representation a la suite du buffer*/
 	for(int i = 0; i < wt -> n; i++){
-		char* swf = wfts((wt->tab) + i);
+		char* swf = wfts(wt->tab + i);
 		strcat(buffer,swf);
 		strcat(buffer,"\n");
 		free(swf);
@@ -139,18 +155,20 @@ WorkTree* stwt(char* ch){
 	while (ch[i] != '\0') {
 		/*Si on rencontre le separateur '\n' on creer une cellule avec ce qu'on à lu jusqu'a maintenant et on l'insere dans la liste*/
 		if (ch[i++] == '\n') {
-			wf=stwf(buffer);
-			appendWorkTree(wt,wf->name,wf->hash,wf->mode);
-			free(wf->name);
-			free(wf->hash);
-			free(wf);
-			/*Reinitialisation du buffer*/
-			memset(buffer, 0, taille);
+			if (strlen(buffer) != 0) {
+				wf=stwf(buffer);
+				appendWorkTree(wt,wf->name,wf->hash,wf->mode);
+				freeWorkFile(wf);
+
+				/*Reinitialisation du buffer*/
+				memset(buffer, 0, taille);
+			}
 		}
 		/*Sinon on sauvegarde le caractere*/
 		else {
 			strcpy(save, buffer);
 			sprintf(buffer, "%s%c", save, ch[i - 1]);
+			memset(save, 0, taille);
 		}
 	}
 	

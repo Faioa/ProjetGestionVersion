@@ -6,6 +6,7 @@
 #include <string.h>
 #include "worktree.h"
 #include "instantane.h"
+#include "file_utility.h"
 
 
 char* blobWorkTree(WorkTree* wt);

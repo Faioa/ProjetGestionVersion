@@ -12,6 +12,7 @@ List* listdir(char* root_dir) {
 	
 	if (dp == NULL) {
 		fprintf(stderr, "Erreur lors de l'ouverture du repertoire %s pour la fonction listdir !\n", root_dir);
+		freeList(list);
 		exit(1);
 	}
 
@@ -204,33 +205,43 @@ char* baseName(char* path) {
 	return res;
 }
 
+/*Concatene les deux chemin en prenant path1 comme parent de path2. Retourne une chaine de caracteres contenant le chemin obtenu apres la fusion.*/
+char* pathConcat(char* path1, char* path2) {
+	/*Initialisation des variables*/
+	int taille = strlen(path1)+strlen(path2)+2;
+	char* res = malloc(sizeof(char)*taille);
+	if (res == NULL) {
+		fprintf(stderr, "Erreur de l'allocation de la memoire pour la fonction pathConcat !\n");
+		exit(1);
+	}
+
+	memset(res, 0, taille);
+	sprintf(res, "%s/%s", path1, path2);
+
+	return res;
+}
+
 /*Copie le contenu du fichier from dans le fichier to*/
 void cp(char* to, char* from) {
 	/*Initialisation et declaration des variables*/
 	FILE* src;
 	FILE* dest;
-	char buffer[256], *dir = dirName(from), *fich = baseName(from);
+	char buffer[256];
 
 	if(is_regular_file(from) != 0) {
 		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s pour la fonction cp : soit il n'existe pas ou bien les droits ne sont pas suffisants !\n", from);
 	}
 
 	/*Ouverture des fichiers source et destination*/
-	src = fopen(from, "r");
-	
+	src = fopen(from, "r");	
 	if (src == NULL) {
 		fprintf(stderr, "Erreur lors de l'ouverture du fichier source %s pour la fonction cp !\n", from);
-		free(dir);
-		free(fich);
 		exit(1);
 	}
 	
 	dest = fopen(to, "w");
-	
 	if (dest == NULL) {
 		fprintf(stderr, "Erreur lors de l'ouverture du fichier destination %s pour la fonction cp !\n", to);
-		free(dir);
-		free(fich);
 		fclose(src);
 		exit(1);
 	}
@@ -240,8 +251,6 @@ void cp(char* to, char* from) {
 		fputs(buffer, dest);
 	}
 
-	free(dir);
-	free(fich);
 	fclose(src);
 	fclose(dest);
 

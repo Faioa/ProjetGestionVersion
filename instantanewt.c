@@ -4,19 +4,9 @@
 /*Creer un fichier temporaire avec la representation du WorkTree et qui renvoie son hash*/
 char* blobWorkTree(WorkTree* wt){
 	/*Initialisation et declaration des variables*/
-	static char template [] = "/tmp/myfileXXXXXX";
+	static char template[] = "/tmp/myfileXXXXXX";
 
-	int sortie;
-	char fname[1000], cmd[1000+TAILLE_MAX], *buffer = (char*) malloc(sizeof(char) * 256), *wtree, *path;
-	;
-
-	if (buffer == NULL) {
-		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres pour la fonction blobWorkTree !\n");
-		exit(1);
-	}
-
-	/*Initialisation du buffer*/
-	memset(buffer, 0, 256);
+	char fname[1000], cmd[1000+TAILLE_MAX], *res, *path, *buffer;
 
 	/*Sauvegarde du template dans une nouvelle string et creation d'un fichier temporaire cree a partir du template*/
 	strcpy (fname, template);
@@ -28,51 +18,22 @@ char* blobWorkTree(WorkTree* wt){
 		/*Ecriture dans un buffer de la commande pour supprimer le fichier temporaire*/
 		sprintf(cmd, "rm %s", fname);
 		system(cmd);
-		free(buffer);
 
 		exit(1);
 	}
 
-	/*Ecriture dans un buffer de la commande a utiliser pour le hachage*/
-	wtree = wtts(wt);
-	sprintf(cmd, "cat %s | sha256sum >%s", wtree, fname);
-	system(cmd);
+	wttf(wt, fname);
+	res = sha256file(fname);
+	buffer = hashToPath(res);
+	path = malloc(sizeof(char)*strlen(buffer)+3);
+	sprintf(path, "%s.t", buffer);
+	cp(path, fname);
 
-	/*Recuperation de la première ligne du fichier temporaire (la commande de hash renvoie de toute façon une unique ligne si un seul fichier est renseigne)*/
-	sortie = read(descripteur, buffer, 256);
-
-	if (sortie == -1) {
-		fprintf(stderr, "Erreur lors de la lecture du fichier temporaire %s de la fonction blobWorkTree !\n", fname);
-		
-		/*Ecriture dans un buffer de la commande pour supprimer le fichier temporaire*/
-		sprintf(cmd, "rm %s", fname);
-		system(cmd);
-		free(buffer);
-		free(wtree);
-
-		exit(1);
-	}
-
-	printf("%s\n",wtree);
-
-	sprintf(cmd, "rm %s", fname);
-	system(cmd);
-
-	strcat(buffer, ".t");
-
-	/*Creation de l'instantane et ecriture de sa representation a l'interieur*/
-	path = hashToPath(buffer);
-
-	/*Ecriture dans un buffer de la commande pour creer l'instantane*/
-	sprintf(cmd, "mkdir -p $(dirname %s) && echo %s > %s", path, wtree, path);
-	system(cmd);
-
-
-	free(wtree);
+	free(buffer);
 	free(path);
 	close(descripteur);
 
-	return buffer;
+	return res;
 }
 
 /*Creer recursivement tous les instantanes du WorkTree et enfin l'instantane de celui-ci*/
@@ -82,42 +43,49 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 	int i;
 	List* l;
 	WorkTree* wtree;
-	char buffer[256];
+	char buffer[256], *new_path;
 
 	memset(buffer, 0, 256);
 
 	/*Parcours du tableau de WorkFile du WorkTree*/
 	for (i = 0; i < wt -> n; i++) {
-		wf = &(wt -> tab)[i];
+		wf = wt -> tab+i;
 
 		/*Si la cibles est un fichier standard*/
 		if (is_regular_file(wf -> name) == 0) {
-			blobFile(wf -> name);
-			wf -> mode = getChmod(wf -> name);
-			wf -> hash = sha256file(wf -> name);
+			new_path = pathConcat(path, wf->name);
+			blobFile(new_path);
+			wf -> mode = getChmod(new_path);
+			wf -> hash = sha256file(new_path);
+			free(new_path);
 		}
 
 		/*Si la cible est un repertoire*/
 		else if (is_directory(wf -> name) == 0) {
 			/*On recupere les noms des fichiers*/
-			l = listdir(wf -> name);
+			new_path = pathConcat(path, wf->name);
+			l = listdir(new_path);
 			wtree = initWorkTree();
 
 			/*On reconstruit le worktree*/
-			while ((*l) != NULL) {
-				appendWorkTree(wtree, (*l) -> data, NULL, 0);
+			for (Cell* cell = *l; cell != NULL; cell = cell -> next) {
+				if (cell -> data[0] == '.') {
+					continue;
+				}
+				appendWorkTree(wtree, cell -> data, NULL, 0);
 			}
 
 			/*On construit le path du nouveau WorkTree*/
-			sprintf(buffer, "%s/%s", path, wf -> name);
+			sprintf(buffer, "%s/%s", path, new_path);
 
 			/*On appelle recursivement la fonction pour ce nouveau WorkTree*/
 			wf -> hash = saveWorkTree(wtree, buffer);
-			wf -> mode = getChmod(wf -> name);
+			wf -> mode = getChmod(new_path);
 
 			/*Libération des variables*/
 			freeList(l);
 			freeWorkTree(wtree);
+			free(new_path);
 		}
 	}
 
@@ -130,55 +98,29 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 
 /*Restore l'arborescence du WorkTree et les fichiers associes*/
 void restoreWorkTree(WorkTree* wt, char* path) {
-	/*Initialisation des variables*/
-	WorkFile* wf;
-	WorkTree* wtree;
-	int i;
-	char* point;
-	char* t;
-	char* from;
-	char to[256], cmd[1000], new_path[256];
-
-	memset(to, 0, 256);
-	memset(cmd, 0, 256);
-	memset(new_path, 0, 256);
+	/*Declaration des variables*/
+	char* new_path, *copyPath, *hash, *buffer;
+	WorkTree* new_wt;
 
 	/*Parcours du tableau de WorkFile du WorkTree*/
-	for (i = 0; i < wt -> n; i++) {
+	for (int i = 0; i < wt -> n; i++) {
+		new_path = pathConcat(path, wt->tab[i].name);
+		copyPath = hashToPath(wt->tab[i].hash);
+		hash = wt->tab[i].hash;
 
-		wf = &(wt -> tab)[i];
-		from = hashToPath(wf -> hash);
-
-		/*On cherche l'extension .t*/
-		point = strrchr(wf -> hash, '.');
-		t = strrchr(wf -> hash, 't');
-
-		/* Si l'extension .t est presente alors les pointeurs sont consecutifs*/
-		if (point != NULL && t != NULL && point == t - 1) {
-			wtree = ftwt(from);
-
-			sprintf(new_path, "%s/%s", path, wf -> name);
-
-			/*On creer le repertoire du nouveau WorkTree*/
-			sprintf(cmd, "mkdir -p %s", new_path);
-			system(cmd);
-
-			restoreWorkTree(wtree, new_path);
-
-			memset(cmd, 0, 256);
-			memset(new_path, 0, 256);
-			freeWorkTree(wtree);
+		/*Si c'est un WorkTree*/
+		if (isWorkTree(hash) == 1) {
+			buffer = malloc(sizeof(char) * (strlen(hash) + 2));
+			sprintf(buffer, "%s.t", hash);
+			new_wt = ftwt(copyPath);
+			restoreWorkTree(new_wt, new_path);
+			setMode(getChmod(copyPath), new_path);
+			free(buffer);
+			freeWorkTree(new_wt);
 		}
-
-		else {
-
-			sprintf(to, "%s/%s", path, wf -> name);
-			cp(to, from);
-			setMode(wf -> mode, to);
-
-			memset(to, 0, 256);
+		else if (isWorkTree(hash) == 0) {
+			cp(new_path, copyPath);
+			setMode(getChmod(copyPath), new_path);
 		}
-		
-		free(from);
 	}
 }

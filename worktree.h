@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "workfile.h"
+#include "file_utility.h"
 
 
 typedef struct {
@@ -20,6 +21,8 @@ WorkTree* initWorkTree();
 void freeWorkTree(WorkTree* wt);
 
 int inWorkTree(WorkTree* wt, char* name);
+
+int isWorkTree(char* hash);
 
 int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode);
 
