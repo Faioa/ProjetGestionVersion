@@ -7,6 +7,7 @@
 #include "ref.h"
 #include "commit.h"
 #include "list_utility.h"
+#include "file_utility.h"
 
 void initBranch();
 

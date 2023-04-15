@@ -11,7 +11,7 @@ void initRefs(){
 void createUpdateRef(char* ref_name, char* hash){
 	
 	char cmd[256], *name = baseName(ref_name);
-	sprintf(cmd,"echo %s > .refs/%s", hash, name);
+	sprintf(cmd,"(echo %s) > $(echo .refs/%s)", hash, name);
 	system(cmd);
 	
 	free(name);
@@ -26,14 +26,15 @@ void deleteRef(char* ref_name){
 }
 char* getRef(char* ref_name){
 	
-	char*result=malloc(sizeof(char)*256);
-	memset(result, 0, 256);
+	char*result;
 	
 	char buffer[256];
 	
 	sprintf(buffer,".refs/%s",ref_name);
 	
-	if(file_exists(buffer)==0)return NULL;
+	if(file_exists(buffer)==0) {
+		return NULL;
+	}
 	
 	FILE*fp=fopen(buffer,"r");
 	
@@ -42,7 +43,21 @@ char* getRef(char* ref_name){
 		exit(1);
 	}
 	
+	result = malloc(sizeof(char)*256);
+	memset(result, 0, 256);
+	if (result == NULL) {
+		fprintf(stderr, "Erreur lors de l'allocation de memoire pour le buffer de la fonction getRef !\n");
+		exit(1);
+	}
 	fgets(result,256,fp);
+
+	/*On supprime un potentiel \n a la fin de la chaine*/
+	for (int i = strlen(result); i > -1; i--) {
+		if (result[i] == '\n') {
+			result[i] = '\0';
+			break;
+		}
+	}
 	
 	fclose(fp);
 	

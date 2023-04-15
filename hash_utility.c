@@ -52,6 +52,17 @@ char* sha256file(char* file){
 		buffer[0] = '\0';
 	}
 
+	/*On retire le "-\n" que renvoie la commande sha256sum*/
+	int i = 0;
+	while (buffer[i] != '\0') {
+		if (buffer[i] == ' ')
+			break;
+		i++;
+	}
+	for (int j = i; j < 255; j++){
+		buffer[j] = '\0';
+	}
+
 	sprintf(cmd, "rm %s", fname);
 	system(cmd);
 
@@ -63,8 +74,12 @@ int hashFile(char* source, char* dest){
 	/*Initialisation du buffer*/
 	char cmd[256];
 
+	char* hash = sha256file(source);
+
 	/*Ecrture dans le buffer de la commande a utiliser pour le hachage*/
-	sprintf(cmd, "cat %s | sha256sum > %s", source, dest);
+	sprintf(cmd, "echo %s > %s", hash, dest);
+
+	free(hash);
 	
 	return system(cmd);
 }

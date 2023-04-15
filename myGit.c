@@ -91,9 +91,9 @@ int main(int argc, char* argv[]) {
 	if (argc > 1 && strcmp(argv[1], "get-current-branch") == 0) {
 		char* branch = getCurrentBranch();
 		if (branch == NULL) {
-			printf("erreur lors de l'ouverture du fichier current_branch");
+			printf("Erreur lors de l'ouverture du fichier current_branch !\n");
 		} else {
-			printf("%s", branch);
+			printf("%s\n", branch);
 			free(branch);
 		}
 	}
@@ -110,8 +110,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (argc > 1 && strcmp(argv[1], "branch-print") == 0) {
-		if (argc > 0) {
-			if (!branchExists(argv[2]) == 0) {
+		if (argc > 2) {
+			if (branchExists(argv[2]) == 0) {
 				printf("La branche n'existe pas.\n");
 			}
 			else {

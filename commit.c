@@ -2,6 +2,9 @@
 
 kvp* createKeyVal(char* key, char* val){
 	kvp* k=malloc(sizeof(kvp));
+	if (k == NULL) {
+		fprintf(stderr, "Erreur lors de l'allocation de memoire pour une association KeyVal dans la fonction createKeyVal !\n");
+	}
 	k->key=strdup(key);
 	k->value=strdup(val);
 	return k;
@@ -86,8 +89,11 @@ char* commitGet(Commit* c, char* key){
 	if (c == NULL)
 		return NULL;
 	//parcours du tableau pour chercher la clé
-	for(int i=0;i<c->n;i++){
-		if(strcmp(c->T[i]->key,key)==0)return c->T[i]->value;
+	for(int i=0;i<c->size;i++){
+		if (c->T[i] != NULL) {
+			if(strcmp(c->T[i]->key,key)==0)
+				return c->T[i]->value;
+		}
 	}
 	return NULL;
 
@@ -246,7 +252,7 @@ char* blobCommit(Commit* c){
 	snprintf(res, 65, "%s", tmp);
 	buffer = hashToPath(res);
 	path = malloc(sizeof(char)*strlen(buffer)+3);
-	sprintf(path, "%s.t", buffer);
+	sprintf(path, "%s.c", buffer);
 	cp(path, fname);
 
 	free(buffer);
@@ -268,9 +274,13 @@ void free_kvp(kvp *k){
 }
 
 void freeCommit(Commit *c){
-	for(int i=0;i<c->size;i++){
-		free_kvp(c->T[i]);
+	if (c != NULL) {
+		for(int i=0; i < c->size; i++){
+			if (c->T[i] != NULL) {
+				free_kvp(c->T[i]);
+			}
+		}
+		free(c->T);
+		free(c);
 	}
-	free(c->T);
-	free(c);
 }

@@ -88,7 +88,7 @@ char* dirName(char* path) {
 	}
 
 	/*Ecriture dans un buffer de la commande a utiliser pour la recuperation du nom du repertoire du fichier*/
-	sprintf(cmd, "dirname %s >%s", path, fname);
+	sprintf(cmd, "echo $(dirname %s) > %s", path, fname);
 	system(cmd);
 
 	f = fdopen(descripteur, "r");

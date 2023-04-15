@@ -1,5 +1,4 @@
 #include "branch.h"
-#include "file_utility.h"
 
 void initBranch(){
 	FILE*f=fopen(".current_branch","w");
@@ -23,41 +22,75 @@ int branchExists(char* branch){
 void createBranch(char* branch){
 	char *hash=getRef("HEAD");
 	createUpdateRef(branch,hash);
+	free(hash);
 }
+
 char * getCurrentBranch(){
-	FILE*f=fopen(".current_branch","r");
-	if(f != NULL){
-		char*buff=malloc(sizeof(char)*1000);
-		fscanf(f,"%s",buff);
-		return buff;
+
+	if (file_exists(".current_branch") != 1) {
+		fprintf(stderr, "Le fichier .current_branch n'existe pas !\n");
+		return NULL;
 	}
-	return NULL;
+
+	FILE*f=fopen(".current_branch","r");
+	if(f == NULL){
+		fprintf(stderr, "Erreur lors de l'ouverture du fichier .current-branch pour la fonction getCurrentBranch !\n");
+		exit(1);
+	}
+
+	char*buff=malloc(sizeof(char)*1000);
+	fscanf(f,"%s",buff);
+
+	fclose(f);
+
+	return buff;
+
+	fclose(f);
 }
 
 char *hashToPathCommit(char* hash){
 	char * buff=malloc(sizeof(char)*1000);
-	sprintf(buff,"%s.c",hashToPath(hash));
+	if (buff == NULL) {
+		fprintf(stderr, "Erreur lors de l'allocation de memoire pour la fonction hashToPathCommit !\n");
+		exit(1);
+	}
+	
+	char* tmp = hashToPath(hash);
+	sprintf(buff,"%s.c", tmp);
+
+	free(tmp);
+
 	return buff;
 }
 
 void printBranch(char* branch){
 	//recupérer le fichier contenant la référence(le hash) du commit
-	char*commit_hash=getRef(branch);
+	char* commit_hash = getRef(branch);
+
 	//conversion en commit
-	Commit * c=ftc(hashToPathCommit(commit_hash));
+	char* path_commit = hashToPathCommit(commit_hash);
+	Commit* c = ftc(path_commit);
+
 	while(c != NULL){
-		if (commitGet(c,"message") != NULL){
-			printf("%s -> %s\n",commit_hash,commitGet(c,"message"));
+		char* c_hash_tmp = commitGet(c, "message");
+		if (c_hash_tmp != NULL){
+			printf("%s -> %s\n", commit_hash, c_hash_tmp);
+			free(c_hash_tmp);
 		}else{
-			printf("%s \n",commit_hash);
+			printf("%s\n", commit_hash);
 		}
-		if(commitGet(c,"predecessor") != NULL){
-			commit_hash=commitGet(c,"predecessor");
-			c=ftc(hashToPathCommit(commit_hash));
+		c_hash_tmp = commitGet(c, "predecessor");
+		if(c_hash_tmp != NULL){
+			freeCommit(c);
+			c = ftc(path_commit);
 		}else{
-			c=NULL;
+			freeCommit(c);
+			c = NULL;
 		}
 	}
+
+	free(commit_hash);
+	free(path_commit);
 }
 
 List* branchList(char* branch){
