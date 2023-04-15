@@ -85,7 +85,7 @@ void myGitCommit(char* branch_name, char * message){
 	char *test2=sha256file(buffer);
 	
 	if(strcmp(test,test2)!=0){
-		fprintf(stderr,"“HEAD doit pointer sur le dernier commit de la branche\n");
+		fprintf(stderr,"HEAD doit pointer sur le dernier commit de la branche\n");
 		free(test);
 		free(test2);
 		return ;
@@ -99,8 +99,6 @@ void myGitCommit(char* branch_name, char * message){
 	system("rm -f .add");
 	
 	char *hash=saveWorkTree(wt,".");
-
-	freeWorkTree(wt);
 	
 	Commit *c=initCommit();
 	
@@ -108,29 +106,29 @@ void myGitCommit(char* branch_name, char * message){
 
 	free(hash);
 	
-	FILE*fp=fopen(branch_name,"r");
+	FILE* fp=fopen(buffer,"r");
 	if (fp == NULL) {
 		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction myGitCommit !\n", branch_name);
-
+		exit(1);
 	}
 	
 	char result[256];
-	
-	
-	if(fgets(result,256,fp)!= NULL && strlen(fgets(result,256,fp))!=0){
+	memset(result, 0, 256);
+
+	if(fgets(result,256,fp) != NULL){
 		commitSet(c,"predecessor",result);
 	}
 	
 	if(message!=NULL){
 		commitSet(c,"message",message);
-	
 	}
-	
+
 	char *hash_commit=blobCommit(c);
 	
-	createUpdateRef(branch_name,hash_commit);
+	createUpdateRef(buffer,hash_commit);
 	createUpdateRef("HEAD",hash_commit);
 	
+	fclose(fp);
 	
 	free(hash_commit);
 	freeCommit(c);

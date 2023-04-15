@@ -106,8 +106,10 @@ char* dirName(char* path) {
 	/*Parcours du fichier temporaire*/
 	if (fgets(dir, 256, f) != NULL) {
 		/*Suppression du caractere '\n' a la fin du nom du fichier*/
-		taille = strcspn(dir, "\n");
-		res = (char*) malloc(sizeof(char) * (taille + 1));
+		taille = strlen(dir) + 1;
+		res = (char*) malloc(sizeof(char) * taille);
+
+		memset(res, 0, taille);
 
 		if (res == NULL) {
 			fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres pour la fonction dirName !\n");
@@ -123,8 +125,10 @@ char* dirName(char* path) {
 			exit(1);
 		}
 
-		strncpy(res, dir, taille);
-		res[taille] = '\0';
+		strncpy(res, dir, taille - 1);
+
+		if (res[taille - 2] == '\n')
+			res[taille - 2] = '\0';
 	}
 	else {
 		res = (char*) (malloc(sizeof(char)));
@@ -175,8 +179,10 @@ char* baseName(char* path) {
 	/*Parcours du fichier temporaire*/
 	if (fgets(fich, 256, f) != NULL) {
 		/*Suppression du caractere '\n' a la fin du nom du fichier*/
-		taille = strcspn(fich, "\n");
-		res = (char*) malloc(sizeof(char) * (taille + 1));
+		taille = strlen(fich) + 1;
+		res = (char*) malloc(sizeof(char) * taille);
+
+		memset(res, 0, taille);
 
 		if (res == NULL) {
 			fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres pour la fonction baseName !\n");
@@ -189,8 +195,9 @@ char* baseName(char* path) {
 			exit(1);
 		}
 
-		strncpy(res, fich, taille);
-		res[taille] = '\0';
+		strncpy(res, fich, taille - 1);
+		if (res[taille - 2] == '\n')
+			res[taille - 2] = '\0';
 	}
 	else {
 		res = (char*) (malloc(sizeof(char)));
@@ -226,11 +233,19 @@ void cp(char* to, char* from) {
 	/*Initialisation et declaration des variables*/
 	FILE* src;
 	FILE* dest;
-	char buffer[256];
+	char buffer[256], *dir, cmd[1000];
 
 	if(is_regular_file(from) != 0) {
 		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s pour la fonction cp : soit il n'existe pas ou bien les droits ne sont pas suffisants !\n", from);
+		exit(1);
 	}
+	
+	dir = dirName(to);
+	if (strcmp(dir, ".") != 0 && strcmp(dir, "..") != 0 ) {
+		sprintf(cmd, "mkdir -p $(dirname %s)", to);
+		system(cmd);
+	}
+	free(dir);
 
 	/*Ouverture des fichiers source et destination*/
 	src = fopen(from, "r");	
@@ -260,7 +275,7 @@ void cp(char* to, char* from) {
 int getChmod ( const char * path ) {
 	struct stat ret;
 
-	if ( stat( path , & ret ) == -1) {
+	if ( stat( path, &ret ) == -1) {
 		return -1;
 	}
 

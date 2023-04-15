@@ -32,13 +32,15 @@ WorkTree* initWorkTree(){
 
 /*Libere la memoire allouee a un WorkTree*/
 void freeWorkTree(WorkTree* wt) {
-	for (int i = 0; i < wt -> n; i++) {
-		if ((wt->tab+i)->name != NULL) {
-			free((wt->tab+i)->name);
+	if (wt == NULL)
+		return;
+	for (int i = wt -> n - 1; i > -1; i--) {
+		if (wt -> tab[i].name != NULL) {
+			free(wt -> tab[i].name);
 		}
 
-		if ((wt->tab+i)->hash != NULL) {
-			free((wt->tab+i)->hash);
+		if (wt -> tab[i].hash != NULL) {
+			free(wt -> tab[i].hash);
 		}
 	}
 	free(wt -> tab);
@@ -77,14 +79,23 @@ int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode){
 	if (inWorkTree(wt,name) == -1 && wt -> n < wt -> size){
 		wt->tab[wt->n].mode = mode;
 
-		if (hash != NULL) {
+		if (hash != NULL && strcmp(hash, "(null)") != 0) {
 			wt->tab[wt->n].hash = strdup(hash);
+			if (wt->tab[wt->n].hash == NULL) {
+				fprintf(stderr, "Erreur lors de l'allocation de la memoire pour hash dans la fonction appendWorkTree !\n");
+				exit(1);
+			}
 		} else {
 			wt->tab[wt->n].hash = NULL;
 		}
 
 		if (name != NULL) {
 			wt->tab[wt->n].name = strdup(name);
+			if (wt->tab[wt->n].name == NULL) {
+				free(wt->tab[wt->n].hash);
+				fprintf(stderr, "Erreur lors de l'allocation de la memoire pour name dans la fonction appendWorkTree !\n");
+				exit(1);
+			}
 		} else {
 			wt->tab[wt->n].name = NULL;
 		}

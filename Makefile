@@ -1,13 +1,13 @@
 CFLAGS = -g -Wall -Wextra -pedantic -Wno-unused-parameter
 CC = gcc
 
-PROGRAMS = exec
+PROGRAMS = myGit
 
 .PHONY:	all clean
 
 all: $(PROGRAMS)
 
-exec: main.c list_utility.o instantane.o file_utility.o hash_utility.o instantanewt.o workfile.o worktree.o ref.o commit.o branch.o check.o fusion.o instantane.h list_utility.h file_utility.h hash_utility.h instantanewt.h workfile.h worktree.h ref.h commit.h branch.h check.h fusion.h
+myGit: myGit.c list_utility.o instantane.o file_utility.o hash_utility.o instantanewt.o workfile.o worktree.o ref.o commit.o branch.o check.o fusion.o instantane.h list_utility.h file_utility.h hash_utility.h instantanewt.h workfile.h worktree.h ref.h commit.h branch.h check.h fusion.h
 	$(CC) -o $@ $(CFLAGS) $^
 
 list_utility.o: list_utility.c list_utility.h

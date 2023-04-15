@@ -44,7 +44,9 @@ Commit* initCommit(){
 	c->size=TAILLE_C;
 	c->n=0;
 	c->T=malloc(sizeof(kvp*)*TAILLE_C);
-	memset(c->T, 0, TAILLE_C);
+	for (int i = 0; i < c -> size; i++) {
+		c->T[i] = NULL;
+	}
 	return c;
 }
 
@@ -52,29 +54,26 @@ unsigned long hash(unsigned char *str){
     unsigned long hash = 5381;
     int c;
 
-    while ((c = (*str)++) != 0)
+    while (c = *str++ != 0)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
     return hash;
 }
 
 void commitSet(Commit* c, char* key, char* value){
-
-	kvp*k=createKeyVal(key,value);
-	
 	int pos=hash((unsigned char *)key), i;
 	
 	for(i=0;i<c->size;i++){
-		if(c->T[((pos+i)%c->size)]==NULL){
-			c->T[((pos+i)%c->size)]=k;
+		if (c->T[((pos+i)%c->size)] == NULL) {
+				c->T[((pos+i)%c->size)] = createKeyVal(key,value);
+				c->n++;
+				break;
 		}
 	}
 	
 	if (i == c -> size) {
 		fprintf(stderr, "Il n'y a plus de place dans le Commit !\n");
+		exit(1);
 	}
-	
-
 }
 
 Commit* createCommit(char* hash){
@@ -98,7 +97,7 @@ char* commitGet(Commit* c, char* key){
 char* cts(Commit* c){
 
 /*Initialisations des variables*/
-	int taille = (256 * 2 + 3) * (c->n); /*256*2+3 est la taille max d'une représentation de WorkFile*/
+	int taille = (256 * 2 + 3) * (c->n) + 1; /*256*2+3 est la taille max d'une représentation de KeyVal*/
 	if (taille == 0) {
 		taille = 1;
 	}
@@ -114,9 +113,13 @@ char* cts(Commit* c){
 	memset(buffer, 0, taille);
 	
 	/*Parcours des elements et ajouts de la representation a la suite du buffer*/
-	for(int i = 0; i < c -> n; i++){
-		strcat(buffer,kvts((c->T)[i]));
-		strcat(buffer,"\n");
+	for(int i = 0; i < c -> size; i++){
+		if ((c->T)[i] != NULL) {
+			char* kv_string = kvts((c->T)[i]);
+			strcat(buffer, kv_string);
+			strcat(buffer,"\n");
+			free(kv_string);
+		}
 	}
 	
 	return buffer;
@@ -217,110 +220,57 @@ Commit* ftc(char* file){
 }
 
 char* blobCommit(Commit* c){
-	/*Initialisation et declaration des variables*//*Initialisation et declaration des variables*/
-	static char template [] = "/tmp/myfileXXXXXX";
+	/*Initialisation et declaration des variables*/
+	static char template[] = "/tmp/myfileXXXXXX";
 
-	int sortie;
-	char fname[1000], cmd[1000+TAILLE_C], *buffer = (char*) malloc(sizeof(char) * 256), *com;
-	;
-
-	if (buffer == NULL) {
-		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres pour la fonction blobWorkTree !\n");
-		exit(1);
-	}
-
-	/*Initialisation du buffer*/
-	memset(buffer, 0, 256);
+	char fname[1000], cmd[10000], *res, *path, *buffer, *tmp;
 
 	/*Sauvegarde du template dans une nouvelle string et creation d'un fichier temporaire cree a partir du template*/
 	strcpy (fname, template);
 	int descripteur = mkstemp(fname);
 
 	if (descripteur == -1) {
-		fprintf(stderr, "Erreur lors de la creation d'un fichier temporaire pour la fonction blobWorkTree !\n");
+		fprintf(stderr, "Erreur lors de la creation d'un fichier temporaire pour la fonction blobCommit !\n");
 		
 		/*Ecriture dans un buffer de la commande pour supprimer le fichier temporaire*/
 		sprintf(cmd, "rm %s", fname);
 		system(cmd);
-		free(buffer);
 
 		exit(1);
 	}
 
-	/*Ecriture dans un buffer de la commande a utiliser pour le hachage*/
-	com = cts(c);
-	sprintf(cmd, "cat %s | sha256sum >%s", com, fname);
-	system(cmd);
+	ctf(c, fname);
+	tmp = sha256file(fname);
+	res = malloc(sizeof(char)*256);
+	memset(res, 0, 256);
+	snprintf(res, 65, "%s", tmp);
+	buffer = hashToPath(res);
+	path = malloc(sizeof(char)*strlen(buffer)+3);
+	sprintf(path, "%s.t", buffer);
+	cp(path, fname);
 
-	/*Recuperation de la première ligne du fichier temporaire (la commande de hash renvoie de toute façon une unique ligne si un seul fichier est renseigne)*/
-	sortie = read(descripteur, buffer, 256);
+	free(buffer);
+	free(path);
+	free(tmp);
+	close(descripteur);
 
-	if (sortie == -1) {
-		fprintf(stderr, "Erreur lors de la lecture du fichier temporaire %s de la fonction blobWorkTree !\n", fname);
-		
-		/*Ecriture dans un buffer de la commande pour supprimer le fichier temporaire*/
-		sprintf(cmd, "rm %s", fname);
-		system(cmd);
-		free(buffer);
-		free(com);
-
-		exit(1);
-	}
-	if (sortie == 0) {
-		buffer[0] = '\0';
-	}
-
-	sprintf(cmd, "rm %s", fname);
-	system(cmd);
-	free(com);
-
-	return buffer;	
+	return res;
 }
 
 void free_kvp(kvp *k){
-	free(k->key);
-	free(k->value);
-	free(k);
+	if (k != NULL) {
+		if (k->key != NULL)
+			free(k->key);
+		if (k->value != NULL)
+			free(k->value);
+		free(k);
+	}
 }
 
 void freeCommit(Commit *c){
-	for(int i=0;i<c->n;i++){
+	for(int i=0;i<c->size;i++){
 		free_kvp(c->T[i]);
 	}
+	free(c->T);
 	free(c);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

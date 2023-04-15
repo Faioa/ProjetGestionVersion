@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "file_utility.h"
+#include "hash_utility.h"
 
 #ifndef COMMIT_H
 #define COMMIT_H

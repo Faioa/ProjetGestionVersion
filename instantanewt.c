@@ -6,7 +6,7 @@ char* blobWorkTree(WorkTree* wt){
 	/*Initialisation et declaration des variables*/
 	static char template[] = "/tmp/myfileXXXXXX";
 
-	char fname[1000], cmd[1000+TAILLE_MAX], *res, *path, *buffer;
+	char fname[1000], cmd[1000+TAILLE_MAX], *res, *path, *buffer, *tmp;
 
 	/*Sauvegarde du template dans une nouvelle string et creation d'un fichier temporaire cree a partir du template*/
 	strcpy (fname, template);
@@ -23,7 +23,10 @@ char* blobWorkTree(WorkTree* wt){
 	}
 
 	wttf(wt, fname);
-	res = sha256file(fname);
+	tmp = sha256file(fname);
+	res = malloc(sizeof(char)*256);
+	memset(res, 0, 256);
+	snprintf(res, 65, "%s", tmp);
 	buffer = hashToPath(res);
 	path = malloc(sizeof(char)*strlen(buffer)+3);
 	sprintf(path, "%s.t", buffer);
@@ -31,6 +34,7 @@ char* blobWorkTree(WorkTree* wt){
 
 	free(buffer);
 	free(path);
+	free(tmp);
 	close(descripteur);
 
 	return res;
@@ -62,6 +66,7 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 
 		/*Si la cible est un repertoire*/
 		else if (is_directory(wf -> name) == 0) {
+			printf("%s\n", wf->name);
 			/*On recupere les noms des fichiers*/
 			new_path = pathConcat(path, wf->name);
 			l = listdir(new_path);
