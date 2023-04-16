@@ -60,7 +60,6 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 			blobFile(new_path);
 			wf -> mode = getChmod(new_path);
 			wf -> hash = sha256file(new_path);
-			printf("nom_fich : %s\n", new_path);
 		}
 
 		/*Si la cible est un repertoire*/
@@ -156,9 +155,7 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 			restoreWorkTree(new_wt, new_path);
 
 			/*On change quand meme le mode du repertoire*/
-			puts("ok1");
 			setMode(chmod, new_path);
-			puts("ok2");
 
 			freeWorkTree(new_wt);
 		}

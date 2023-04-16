@@ -96,39 +96,57 @@ void printBranch(char* branch){
 List* branchList(char* branch){
 	List*l=initList();
 	char * commit_hash=getRef(branch);
-	Commit * c=ftc(hashToPathCommit(commit_hash));
+	char* path = hashToPathCommit(commit_hash);
+	Commit * c=ftc(path);
+
 	while( c != NULL ){
-		Cell*cellule=buildCell(commit_hash);
-		insertFirst(l,cellule);
-		if(commitGet(c,"predecessor") != NULL){
-			commit_hash=commitGet(c,"predecessor");
-			c=ftc(hashToPathCommit(commit_hash));
+		insertFirst(l, buildCell(commit_hash));
+		free(commit_hash);
+		commit_hash = commitGet(c,"predecessor");
+
+		if(commit_hash != NULL){
+			char* hash = hashToPathCommit(commit_hash);
+			freeCommit(c);
+			c=ftc(hash);
+			free(hash);
 		}else{
+			freeCommit(c);
 			c=NULL;
 		}
 	}
+
+	free(path);
+
 	return l;
 }
 
 List * getAllCommits(){
-	List*result=initList();
-	List*all=listdir(".refs");
-	Cell*cellule=*all;
+	List* result = initList();
+	List* all = listdir(".refs");
+	Cell* cellule = *all;
+
 	while (cellule != NULL){
-		if(*(cellule->data)=='.')continue;
-
-		List*br_list=branchList(cellule->data);
-
-		Cell*cell2=*br_list;
-		while(cell2 != NULL){
-			if(searchList(result,cell2->data) == NULL){
-				insertFirst(result,buildCell(cell2->data));
-			}
-			cell2=cell2->next;
+		if(cellule->data[0] == '.') {
+			cellule = cellule -> next;
+			continue;
 		}
+
+		List* br_list = branchList(cellule->data);
+
+		Cell* cellule2 = *br_list;
+		while(cellule2 != NULL){
+			if(searchList(result, cellule2->data) == NULL){
+				insertFirst(result, buildCell(cellule2->data));
+			}
+			cellule2 = cellule2->next;
+		}
+
 		freeList(br_list);
-		cellule=cellule->next;
+		
+		cellule = cellule->next;
 	}
+
 	freeList(all);
+	
 	return result;
 }
