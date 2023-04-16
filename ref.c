@@ -84,7 +84,7 @@ void myGitAdd(char* file_or_folder){
 void myGitCommit(char* branch_name, char * message){
 
 	if(is_directory(".refs") != 0){
-		fprintf(stderr,"Initialiser d'abord les références du projet\n");
+		fprintf(stderr,"Initialiser d'abord les références du projet !\n");
 		return ;
 	}
 	
@@ -93,25 +93,18 @@ void myGitCommit(char* branch_name, char * message){
 		return ;
 	}
 	
-	char *test=sha256file(".refs/HEAD");
-	
 	char buffer[256];
-	sprintf(buffer,".refs/%s",branch_name);
-	char *test2=sha256file(buffer);
-	char* content1 = getContent(".refs/HEAD");
-	char* content2 = getContent(buffer);
+	sprintf(buffer,".refs/%s", branch_name);
+	char* content1 = getRef(".refs/HEAD");
+	char* content2 = getRef(buffer);
 	
-	if(strcmp(test,test2)!=0 && strlen(content1) == 0 && strlen(content2) == 0){
+	if(content1 != NULL && content2 != NULL && strcmp(content1,content2) != 0){
 		fprintf(stderr,"HEAD doit pointer sur le dernier commit de la branche\n");
-		free(test);
-		free(test2);
 		free(content1);
 		free(content2);
 		return ;
 	}
 
-	free(test);
-	free(test2);
 	free(content1);
 	free(content2);
 	

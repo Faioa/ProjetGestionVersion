@@ -272,24 +272,21 @@ void cp(char* to, char* from) {
 	return;
 }
 
-int getChmod ( const char * path ) {
-	struct stat ret;
+mode_t getChmod ( const char * path ) {
+	struct stat st;
 
-	if ( stat( path, &ret ) == -1) {
+	if (stat(path, &st) == -1) {
 		return -1;
 	}
 
-	return ( ret . st_mode & S_IRUSR ) | ( ret . st_mode & S_IWUSR ) | ( ret . st_mode & S_IXUSR ) |/*owner*/
-	( ret . st_mode & S_IRGRP ) | ( ret . st_mode & S_IWGRP ) | ( ret . st_mode & S_IXGRP ) |/*group*/
-	( ret . st_mode & S_IROTH ) | ( ret . st_mode & S_IWOTH ) | ( ret . st_mode & S_IXOTH );/*other*/
+	return st.st_mode;
 }
 
-void setMode ( int mode , char * path ) {
-	char buff[100];
-
-	sprintf( buff , "chmod %o %s",mode ,path );
-
-	system(buff);
+void setMode (mode_t mode , char* path) {
+	if (chmod(path, mode) == -1) {
+        fprintf(stderr, "Erreur lors de la modification des permissions de %s !\n", path);
+        exit(1);
+    }
 }
 
 char* getContent(char* path) {

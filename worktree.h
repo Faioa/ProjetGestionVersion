@@ -24,7 +24,7 @@ int inWorkTree(WorkTree* wt, char* name);
 
 int isWorkTree(char* hash);
 
-int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode);
+int appendWorkTree(WorkTree* wt, char* name, char* hash, mode_t mode);
 
 char* wtts(WorkTree* wt);
 

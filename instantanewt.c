@@ -6,7 +6,7 @@ char* blobWorkTree(WorkTree* wt){
 	/*Initialisation et declaration des variables*/
 	static char template[] = "/tmp/myfileXXXXXX";
 
-	char fname[1000], cmd[1000+TAILLE_MAX], *res, *path, *buffer, *tmp;
+	char fname[1000], cmd[1000+TAILLE_MAX], *res;
 
 	/*Sauvegarde du template dans une nouvelle string et creation d'un fichier temporaire cree a partir du template*/
 	strcpy (fname, template);
@@ -21,21 +21,22 @@ char* blobWorkTree(WorkTree* wt){
 
 		exit(1);
 	}
+	close(descripteur);
 
 	wttf(wt, fname);
-	tmp = sha256file(fname);
-	res = malloc(sizeof(char)*256);
-	memset(res, 0, 256);
-	snprintf(res, 65, "%s", tmp);
-	buffer = hashToPath(res);
-	path = malloc(sizeof(char)*strlen(buffer)+3);
+	res = sha256file(fname);
+	char *buffer = hashToPath(res);
+	int taille = strlen(buffer)+3;
+	char path[taille];
+	memset(path, 0, taille);
 	sprintf(path, "%s.t", buffer);
 	cp(path, fname);
 
+	/*Ecriture dans un buffer de la commande pour supprimer le fichier temporaire*/
+	sprintf(cmd, "rm %s", fname);
+	system(cmd);
+	
 	free(buffer);
-	free(path);
-	free(tmp);
-	close(descripteur);
 
 	return res;
 }
@@ -76,7 +77,7 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 
 				char* nom_fich = pathConcat(new_path, cell->data);
 				char* hash = NULL;
-				int mode = 0;
+				mode_t mode = 0;
 				if (is_regular_file(nom_fich) == 0) {
 					hash = sha256file(nom_fich);
 					mode = getChmod(nom_fich);
@@ -133,6 +134,7 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 		
 		/*On creer le chemin vers ce nouveau fichier*/
 		new_path = pathConcat(path, basename);
+		free(basename);
 		
 		/*On recupere le mode du fichier*/
 		chmod = wt->tab[i].mode;
@@ -171,6 +173,5 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 
 		free(hashPath);
 		free(new_path);
-		free(basename);
 	}
 }

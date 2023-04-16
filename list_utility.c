@@ -223,17 +223,19 @@ void freeCell(Cell* cell) {
 
 /*Libere une liste de cellule*/
 void freeList(List* list) {
-	/*Initialisation des variables*/
-	List tmp = *list, suiv;
+	if (list != NULL) {
+		/*Initialisation des variables*/
+		List tmp = *list, suiv;
 
-	/*Parcours de la liste et liberation des cellules croisees*/
-	while (tmp != NULL) {
-		suiv = tmp -> next;
-		freeCell(tmp);
-		tmp = suiv;
+		/*Parcours de la liste et liberation des cellules croisees*/
+		while (tmp != NULL) {
+			suiv = tmp -> next;
+			freeCell(tmp);
+			tmp = suiv;
+		}
+
+		free(list);
 	}
-
-	free(list);
 
 	return;
 }
@@ -246,6 +248,7 @@ void afficheList(List* list) {
 	/*Parcours de la liste et affichage des champs 'data' des cellules croisees*/
 	while (tmp != NULL) {
 		printf("%s\n", tmp -> data);
+		tmp = tmp -> next;
 	}
 
 	return;

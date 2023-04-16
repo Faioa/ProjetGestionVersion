@@ -76,7 +76,7 @@ int isWorkTree(char* hash) {
 }
 
 /*Ajoute un element au WorkTree si il n'y est pas deja*/
-int appendWorkTree(WorkTree* wt, char* name, char* hash, int mode){
+int appendWorkTree(WorkTree* wt, char* name, char* hash, mode_t mode){
 	if (inWorkTree(wt,name) == -1 && wt -> n < wt -> size){
 		wt->tab[wt->n].mode = mode;
 

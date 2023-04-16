@@ -6,7 +6,10 @@ kvp* createKeyVal(char* key, char* val){
 		fprintf(stderr, "Erreur lors de l'allocation de memoire pour une association KeyVal dans la fonction createKeyVal !\n");
 	}
 	k->key=strdup(key);
-	k->value=strdup(val);
+	if (val != NULL)
+		k->value = strdup(val);
+	else
+		k->value = NULL;
 	return k;
 }
 
@@ -65,9 +68,9 @@ unsigned long hash(unsigned char *str){
 }
 
 void commitSet(Commit* c, char* key, char* value){
-	int pos=hash((unsigned char *)key), i;
+	int pos = hash((unsigned char *)key), i;
 	
-	for(i=0;i<c->size;i++){
+	for(i=0; i < c->size; i++){
 		if (c->T[((pos+i)%c->size)] == NULL) {
 				c->T[((pos+i)%c->size)] = createKeyVal(key,value);
 				c->n++;

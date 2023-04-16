@@ -26,9 +26,9 @@ char* baseName(char* path);
 
 char* pathConcat(char* path1, char* path2);
 
-int getChmod(const char* path);
+mode_t getChmod(const char* path);
 
-void setMode(int mode, char* path);
+void setMode(mode_t mode, char* path);
 
 char* getContent(char* path); 
 

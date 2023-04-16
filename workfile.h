@@ -9,7 +9,7 @@
 typedef struct {
 	char * name;
 	char * hash;
-	int mode;
+	mode_t mode;
 } WorkFile;
 
 
