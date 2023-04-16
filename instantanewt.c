@@ -47,27 +47,25 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 	int i;
 	List* l;
 	WorkTree* wtree;
-	char buffer[256], *new_path;
-
-	memset(buffer, 0, 256);
+	char *new_path;
 
 	/*Parcours du tableau de WorkFile du WorkTree*/
 	for (i = 0; i < wt -> n; i++) {
 		wf = wt -> tab+i;
 
+		new_path = pathConcat(path, wf->name);
+
 		/*Si la cibles est un fichier standard*/
-		if (is_regular_file(wf -> name) == 0) {
-			new_path = pathConcat(path, wf->name);
+		if (is_regular_file(new_path) == 0) {
 			blobFile(new_path);
 			wf -> mode = getChmod(new_path);
 			wf -> hash = sha256file(new_path);
-			free(new_path);
+			printf("nom_fich : %s\n", new_path);
 		}
 
 		/*Si la cible est un repertoire*/
-		else if (is_directory(wf -> name) == 0) {
+		else if (is_directory(new_path) == 0) {
 			/*On recupere les noms des fichiers*/
-			new_path = pathConcat(path, wf->name);
 			l = listdir(new_path);
 			wtree = initWorkTree();
 
@@ -76,23 +74,32 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 				if (cell -> data[0] == '.') {
 					continue;
 				}
-				/************************************************/
-				/*	 ICI POUR LE MODE ET LE HASH EN RECURSIF 	*/
-				/************************************************/
-				appendWorkTree(wtree, cell -> data, NULL, 0);
+
+				char* nom_fich = pathConcat(new_path, cell->data);
+				char* hash = NULL;
+				int mode = 0;
+				if (is_regular_file(nom_fich) == 0) {
+					hash = sha256file(nom_fich);
+					mode = getChmod(nom_fich);
+				}		
+				
+				appendWorkTree(wtree, cell -> data, hash, mode);
+
+				if(hash != NULL) {
+					free(hash);
+				}
+				free(nom_fich);
 			}
 
-			/*On construit le path du nouveau WorkTree*/
-			sprintf(buffer, "%s/%s", path, new_path);
-
 			/*On appelle recursivement la fonction pour ce nouveau WorkTree*/
-			wf -> hash = saveWorkTree(wtree, buffer);
+			wf -> hash = saveWorkTree(wtree, new_path);
 			wf -> mode = getChmod(new_path);
 
 			/*Libération des variables*/
 			freeList(l);
-			free(new_path);
 		}
+
+		free(new_path);
 	}
 
 	char* res = blobWorkTree(wt);
@@ -143,13 +150,15 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 			/*On creer un nouveau WorkTree pour appeler la fonction recursivement*/
 			new_wt = ftwt(buffer);
 
-			/*Meme si la fonction cp s'occupe deja de creer les repertoires parents d'un fichier lorsqu'ils n'existent pas, on a besoin de le creer manuellement ici pour changer le mode.*/
+			/*Comme la fonction cp s'occupe deja de creer les repertoires parents d'un fichier lorsqu'ils n'existent pas, on n'a besoin de le creer manuellement ici pour changer le mode.*/
 
 			/*On restore recursivement le WorkTree*/
 			restoreWorkTree(new_wt, new_path);
 
 			/*On change quand meme le mode du repertoire*/
+			puts("ok1");
 			setMode(chmod, new_path);
+			puts("ok2");
 
 			freeWorkTree(new_wt);
 		}
@@ -159,6 +168,8 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 
 			/*On change son mode*/
 			setMode(chmod, new_path);
+		} else {
+			fprintf(stderr, "Impossible de retrouver les informations de %s, veuillez verifier l'integriter des fichiers du commit !\n", new_path);
 		}
 
 		free(hashPath);
