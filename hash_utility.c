@@ -96,7 +96,6 @@ char* hashToPath(char* hash) {
 	}
 
 	res = (char *) malloc(sizeof(char) * taille);
-	
 	if (res == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres pour la fonction hashToPath !\n");
 		exit(1);

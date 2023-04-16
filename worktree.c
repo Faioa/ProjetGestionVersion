@@ -65,6 +65,7 @@ int isWorkTree(char* hash) {
 	char buffer[taille];
 	memset(buffer, 0, taille);
 	sprintf(buffer, "%s.t", hash);
+	
 	if(file_exists(buffer) == 1) {
 		return 1;
 	}

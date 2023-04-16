@@ -66,7 +66,6 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 
 		/*Si la cible est un repertoire*/
 		else if (is_directory(wf -> name) == 0) {
-			printf("%s\n", wf->name);
 			/*On recupere les noms des fichiers*/
 			new_path = pathConcat(path, wf->name);
 			l = listdir(new_path);
@@ -77,6 +76,9 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 				if (cell -> data[0] == '.') {
 					continue;
 				}
+				/************************************************/
+				/*	 ICI POUR LE MODE ET LE HASH EN RECURSIF 	*/
+				/************************************************/
 				appendWorkTree(wtree, cell -> data, NULL, 0);
 			}
 
@@ -89,7 +91,6 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 
 			/*Libération des variables*/
 			freeList(l);
-			freeWorkTree(wtree);
 			free(new_path);
 		}
 	}
@@ -104,28 +105,64 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 /*Restore l'arborescence du WorkTree et les fichiers associes*/
 void restoreWorkTree(WorkTree* wt, char* path) {
 	/*Declaration des variables*/
-	char* new_path, *copyPath, *hash, *buffer;
+	char* new_path, *hashPath, *basename;
 	WorkTree* new_wt;
+	int chmod, is_wt;
 
 	/*Parcours du tableau de WorkFile du WorkTree*/
 	for (int i = 0; i < wt -> n; i++) {
-		new_path = pathConcat(path, wt->tab[i].name);
-		copyPath = hashToPath(wt->tab[i].hash);
-		hash = wt->tab[i].hash;
+		if (wt->tab[i].hash == NULL || wt->tab[i].name == NULL)
+			continue;
 
+		/*On recupere le nom du fichier (sans le chemin) pour etre sur de construire le fichier au bon endroit dans tous les cas*/
+		basename = baseName(wt->tab[i].name);
+
+		if (strcmp("myGit", basename) == 0) {
+			free(basename);
+			continue;
+		}
+
+		/*On recupere le hash du fichier*/
+		hashPath = hashToPath(wt->tab[i].hash);
+		
+		/*On creer le chemin vers ce nouveau fichier*/
+		new_path = pathConcat(path, basename);
+		
+		/*On recupere le mode du fichier*/
+		chmod = wt->tab[i].mode;
+
+		is_wt = isWorkTree(hashPath);
 		/*Si c'est un WorkTree*/
-		if (isWorkTree(hash) == 1) {
-			buffer = malloc(sizeof(char) * (strlen(hash) + 2));
-			sprintf(buffer, "%s.t", hash);
-			new_wt = ftwt(copyPath);
+		if (is_wt == 1) {
+			/*On change le nom du nouveau path pour qu'il ait l'extension .t des WorkTree*/
+			int taille = strlen(hashPath) + 2;
+			char buffer[taille];
+			memset(buffer, 0, taille);
+			sprintf(buffer, "%s.t", hashPath);
+
+			/*On creer un nouveau WorkTree pour appeler la fonction recursivement*/
+			new_wt = ftwt(buffer);
+
+			/*Meme si la fonction cp s'occupe deja de creer les repertoires parents d'un fichier lorsqu'ils n'existent pas, on a besoin de le creer manuellement ici pour changer le mode.*/
+
+			/*On restore recursivement le WorkTree*/
 			restoreWorkTree(new_wt, new_path);
-			setMode(getChmod(copyPath), new_path);
-			free(buffer);
+
+			/*On change quand meme le mode du repertoire*/
+			setMode(chmod, new_path);
+
 			freeWorkTree(new_wt);
 		}
-		else if (isWorkTree(hash) == 0) {
-			cp(new_path, copyPath);
-			setMode(getChmod(copyPath), new_path);
+		else if (is_wt == 0) {
+			/*On recreer le fichier*/
+			cp(new_path, hashPath);
+
+			/*On change son mode*/
+			setMode(chmod, new_path);
 		}
+
+		free(hashPath);
+		free(new_path);
+		free(basename);
 	}
 }

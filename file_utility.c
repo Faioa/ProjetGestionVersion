@@ -287,7 +287,48 @@ int getChmod ( const char * path ) {
 void setMode ( int mode , char * path ) {
 	char buff[100];
 
-	sprintf( buff , "chmod %d %s ",mode ,path );
+	sprintf( buff , "chmod %o %s",mode ,path );
 
 	system(buff);
+}
+
+char* getContent(char* path) {
+	if (path == NULL)
+		return NULL;
+
+	if (is_regular_file(path) == 0) {
+		FILE* f = fopen(path, "r");
+		char* result;
+		if (f == NULL) {
+			fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction getContent !\n", path);
+			exit(1);
+		}
+
+		result = malloc(sizeof(char)*10000);
+		if (result == NULL) {
+			fprintf(stderr, "Erruer lors de l'allocation de memoire pour le buffer de la fonction getContent !\n");
+			exit(1);
+		}
+
+		memset(result, 0, 10000);
+		char buffer[256];
+		while (fgets(buffer, 256, f) != NULL) {
+			strcat(result, buffer);
+		}
+
+		int taille = strlen(result);
+		if (taille > 0 && result[taille-1] == '\n')
+			result[taille-1] = '\n';
+
+		fclose(f);
+
+		return result;
+	} else if (is_directory(path) == 0) {
+		printf("%s est un repertoire, veuillez preciser le fichier dont vous avez besoin :\n", path);
+		List* liste = listdir(path);
+		afficheList(liste);
+		freeList(liste);
+	}
+
+	return NULL;
 }

@@ -1,27 +1,34 @@
 #include "check.h"
 
 void restoreCommit(char *hash_commit){
+
+    if (hash_commit == NULL || strlen(hash_commit) == 0) {
+        return;
+    }
+
     char buffer[1000];
     char*path=hashToPathCommit(hash_commit);
     Commit*c=ftc(path);
     char* tab=commitGet(c,"tree");
-    sprintf(buffer,"%s.t",hashToPath(tab));
+    char* path_commit = hashToPath(tab);
+    sprintf(buffer,"%s.t", path_commit);
 	WorkTree*wt=ftwt(buffer);
     restoreWorkTree(wt,".");
     free(path);
     freeWorkTree(wt);
     freeCommit(c);
-    free(tab);
+    free(path_commit);
 }
 
 void myGitCheckoutBranch(char * branch){
     FILE*f=fopen(".current_branch","w");
     fprintf(f,"%s",branch);
     fclose(f);
-    char*ref=getRef(branch);
+
+    char* ref = getRef(branch);
     createUpdateRef("HEAD",ref);
     restoreCommit(ref);
-
+    free(ref);
 }
 
 List* filterList(List * L, char * pattern){
@@ -41,12 +48,12 @@ void myGitCheckoutCommit(char * pattern){
     List*l_pattern=filterList(l_commit,pattern);
     Cell*c_pattern=*l_pattern;
     if(c_pattern == NULL){
-        fprintf(stderr,"aucune branche ne correspond à ce pattern\n");
+        fprintf(stderr,"Aucune branche ne correspond a ce pattern !\n");
     }else{
         if(c_pattern->next == NULL){
             myGitCheckoutBranch(c_pattern->data);
         }else{
-            fprintf(stdout,"Veuillez précicez votre requete\n");
+            printf("Veuillez precicez votre requete !\n");
             afficheList(l_pattern);
         }
     }

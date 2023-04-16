@@ -30,8 +30,10 @@ char* kvts(kvp* k){
 
 kvp* stkv(char* str){
 	char key[256];
+	memset(key, 0, 256);
  
 	char val[256];
+	memset(val, 0, 256);
  
  
 	sscanf(str,"%s :%s",key,val);

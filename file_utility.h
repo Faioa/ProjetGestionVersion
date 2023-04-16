@@ -28,6 +28,8 @@ char* pathConcat(char* path1, char* path2);
 
 int getChmod(const char* path);
 
-void setMode(int mode, char* path); 
+void setMode(int mode, char* path);
+
+char* getContent(char* path); 
 
 #endif

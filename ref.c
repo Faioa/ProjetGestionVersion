@@ -98,16 +98,22 @@ void myGitCommit(char* branch_name, char * message){
 	char buffer[256];
 	sprintf(buffer,".refs/%s",branch_name);
 	char *test2=sha256file(buffer);
+	char* content1 = getContent(".refs/HEAD");
+	char* content2 = getContent(buffer);
 	
-	if(strcmp(test,test2)!=0){
+	if(strcmp(test,test2)!=0 && strlen(content1) == 0 && strlen(content2) == 0){
 		fprintf(stderr,"HEAD doit pointer sur le dernier commit de la branche\n");
 		free(test);
 		free(test2);
+		free(content1);
+		free(content2);
 		return ;
 	}
 
 	free(test);
 	free(test2);
+	free(content1);
+	free(content2);
 	
 	WorkTree*wt=ftwt(".add");
 	
