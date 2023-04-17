@@ -1,5 +1,6 @@
 #include "fusion.h"
 
+/*Retourne un pointeur sur un nouveau WorkTree qui est la fusion des deux donnes en parametres. La liste en parametre est completee avec les noms des fichiers conflictuels.*/
 WorkTree* mergeWorkTrees(WorkTree* wt1, WorkTree* wt2, List** conflicts){
     if (wt1 == NULL) {
         return wt2;
@@ -43,6 +44,7 @@ WorkTree* mergeWorkTrees(WorkTree* wt1, WorkTree* wt2, List** conflicts){
     return wt;
 }
 
+/*Retourne la liste des conflits pour la fusion de la branche distante remote_branch et de la branche coourante si il y en a. Sinon, la fonction fait la fusion des deux branches*/
 List* merge(char* remote_branch, char* message){
 
     if (branchExists(remote_branch) != 1) {
@@ -145,6 +147,7 @@ List* merge(char* remote_branch, char* message){
     }
 }
 
+/*Cree et effectue un commit de suppression pour la branch donnee en parametre : tous les fichiers listes dans la liste conflicts sont enleve du commit*/
 void createDeletionCommit(char* branch, List* conflicts, char* message){
     if (branchExists(branch) != 1) {
         fprintf(stderr, "La branche %s n'existe pas !\n", branch);

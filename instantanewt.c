@@ -23,13 +23,18 @@ char* blobWorkTree(WorkTree* wt){
 	}
 	close(descripteur);
 
+	/*Sauvegarde du WorkTree dans le fichier temporaire*/
 	wttf(wt, fname);
+
+	/*Recuperation du chemin ou sauvegarder le WorkTree*/
 	res = sha256file(fname);
 	char *buffer = hashToPath(res);
 	int taille = strlen(buffer)+3;
 	char path[taille];
 	memset(path, 0, taille);
 	sprintf(path, "%s.t", buffer);
+
+	/*Sauvegarde du WorkTree*/
 	cp(path, fname);
 
 	/*Ecriture dans un buffer de la commande pour supprimer le fichier temporaire*/

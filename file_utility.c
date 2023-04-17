@@ -240,6 +240,7 @@ void cp(char* to, char* from) {
 		exit(1);
 	}
 	
+	/*Recuperation du nom du repertoire de la destination*/
 	dir = dirName(to);
 	if (strcmp(dir, ".") != 0 && strcmp(dir, "..") != 0 ) {
 		sprintf(cmd, "mkdir -p $(dirname %s)", to);
@@ -272,6 +273,7 @@ void cp(char* to, char* from) {
 	return;
 }
 
+/*Renvoie les droits du fichier donne en parametre*/
 mode_t getChmod ( const char * path ) {
 	struct stat st;
 
@@ -282,50 +284,11 @@ mode_t getChmod ( const char * path ) {
 	return st.st_mode;
 }
 
+/*Change les droits du fichier donne en parametre*/
 void setMode (mode_t mode , char* path) {
+	/*La fonction chmod est fournie dans sys/stat.h*/
 	if (chmod(path, mode) == -1) {
         fprintf(stderr, "Erreur lors de la modification des permissions de %s !\n", path);
         exit(1);
     }
-}
-
-char* getContent(char* path) {
-	if (path == NULL)
-		return NULL;
-
-	if (is_regular_file(path) == 0) {
-		FILE* f = fopen(path, "r");
-		char* result;
-		if (f == NULL) {
-			fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction getContent !\n", path);
-			exit(1);
-		}
-
-		result = malloc(sizeof(char)*10000);
-		if (result == NULL) {
-			fprintf(stderr, "Erruer lors de l'allocation de memoire pour le buffer de la fonction getContent !\n");
-			exit(1);
-		}
-
-		memset(result, 0, 10000);
-		char buffer[256];
-		while (fgets(buffer, 256, f) != NULL) {
-			strcat(result, buffer);
-		}
-
-		int taille = strlen(result);
-		if (taille > 0 && result[taille-1] == '\n')
-			result[taille-1] = '\n';
-
-		fclose(f);
-
-		return result;
-	} else if (is_directory(path) == 0) {
-		printf("%s est un repertoire, veuillez preciser le fichier dont vous avez besoin :\n", path);
-		List* liste = listdir(path);
-		afficheList(liste);
-		freeList(liste);
-	}
-
-	return NULL;
 }

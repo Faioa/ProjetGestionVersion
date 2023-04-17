@@ -125,9 +125,9 @@ List* stol(char* s) {
 	/*Initialisation des variables*/
 	List* res = initList();
 	Cell* cell = NULL;
+
 	int taille = strlen(s) + 1;
 	char *buffer = (char*) malloc(sizeof(char) * taille);
-
 	if (buffer == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres (buffer) pour la fonction stol !\n");
 
@@ -135,7 +135,6 @@ List* stol(char* s) {
 	}
 
 	char *save = (char*) malloc(sizeof(char) * taille);
-
 	if (save == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres (save) pour la fonction stol !\n");
 

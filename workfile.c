@@ -37,12 +37,14 @@ void freeWorkFile(WorkFile* w) {
 
 /*Renvoie la chiane de caractere contenant les champs du WorkFile wf, separes par \t*/
 char* wfts(WorkFile* wf){
+	/*Allocation de la memoire*/
 	int taille = 256*2+3;
 	char * buffer=malloc(sizeof(char)*taille);
 	if (buffer == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'un buffer pour la fonction wfts !\n");
 		exit(1);
 	}
+
 	memset(buffer, 0, taille);
 	
 	sprintf(buffer,"%s\t%s\t%d",wf->name,wf->hash,wf->mode);
@@ -50,12 +52,10 @@ char* wfts(WorkFile* wf){
 	return buffer;
 }
 
+/*Reconstruit un WorkFile a partir de sa representation en chaine de caracteres*/
 WorkFile* stwf(char* ch){
-
 	char name[256];
- 
 	char hash[256];
- 
 	int mode;
  
 	sscanf(ch,"%s\t%s\t%d",name,hash,&mode);

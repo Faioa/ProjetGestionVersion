@@ -21,6 +21,7 @@ WorkTree* initWorkTree(){
 		exit(1);
 	}
 
+	/*Initialisation des champs*/
 	for(int i = 0; i < wt -> size; i++) {
 		(wt -> tab[i]).name = NULL;
 		(wt -> tab[i]).hash = NULL;
@@ -77,6 +78,7 @@ int isWorkTree(char* hash) {
 
 /*Ajoute un element au WorkTree si il n'y est pas deja*/
 int appendWorkTree(WorkTree* wt, char* name, char* hash, mode_t mode){
+	/*On verifie que l'element ne soit pas deja dans le WorkTree*/
 	if (inWorkTree(wt,name) == -1 && wt -> n < wt -> size){
 		wt->tab[wt->n].mode = mode;
 
@@ -143,16 +145,15 @@ WorkTree* stwt(char* ch){
 	/*Initialisation des variables*/
 	WorkTree* wt = initWorkTree();
 	WorkFile* wf = NULL;
+	
 	int taille = strlen(ch) + 1;
 	char *buffer = (char*) malloc(sizeof(char) * taille);
-
 	if (buffer == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres (buffer) pour la fonction stwt !\n");
 		exit(1);
 	}
 
 	char *save = (char*) malloc(sizeof(char) * taille);
-
 	if (save == NULL) {
 		fprintf(stderr, "Erreur lors de l'allocation d'une chaine de caracteres (save) pour la fonction stwt !\n");
 		free(buffer);

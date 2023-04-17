@@ -17,144 +17,284 @@
 int main(int argc, char* argv[]) {
 
 	if (argc > 1 && strcmp(argv[1], "init") == 0) {
+		/*On initialise les references par defaut*/
  		initRefs();
  		initBranch();
+ 		printf("Depot local initialise !\n");
+ 		return 0;
 	}
 
+
 	if (argc > 1 && strcmp(argv[1], "refs-list") == 0) {
+		/*On recupere toutes les references et on affiche la liste*/
 		if (file_exists(".refs")) {
 			List* L = listdir(".refs");
 			printf("REFS :\n");
+
+			/*Parcours et affichage de la liste*/
 			for (Cell* ptr = *L; ptr != NULL; ptr = ptr -> next) {
 				if ( ptr -> data[0] == '.' )
 					continue;
+
+				/*On recupere le hash du dernier commit de la reference*/
 				char* content = getRef(ptr -> data);
+
 				printf("−%s\t%s\n" , ptr -> data, content);
+
 				free(content);
 			}
+
 			freeList(L);
+
+			return 0;
 		} else {
-			printf("Il n'y a pas de reference.\n");
+			fprintf(stderr, "Il n'y a pas de reference.\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
 		}
 	}
 
+
 	if (argc > 1 && strcmp(argv[1], "create-refs") == 0) {
-		if (argc > 3)
+		if (argc > 3) {
+			/*Si il y a le bon nombre d'arguments, on creer/modifie la reference*/
 			createUpdateRef(argv[2], argv[3]);
-		else
-			printf("Veuillez renseigner le nom de la reference et son hash.\n");
+
+			printf("La reference %s a ete creee avec succes !\n", argv[2]);
+			
+			return 0;
+		}
+		else {
+			fprintf(stderr, "Veuillez renseigner le nom de la reference et son hash.\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
+		}
 	}
 	
+
 	if (argc > 1 && strcmp(argv[1], "delete-ref") == 0) {
-		if (argc > 2)
-			deleteRef(argv[2]);
-		else
-			printf("Veuillez renseigner le nom de la reference.\n");
+		/*Si la reference existe, on la supprime*/
+		if (argc > 2) {
+			if (branchExists(argv[2]) == 1) {
+				deleteRef(argv[2]);
+
+				printf("La reference %s a ete supprimee avec succes !\n", argv[2]);
+
+				return 0;
+			}
+			else {
+				fprintf(stderr, "La reference %s existe deja !\nUtilisez './myGit help' pour plus d'informations !\n", argv[2]);
+				
+				return 1;
+			}
+		}
+		else {
+			fprintf(stderr, "Veuillez renseigner le nom de la reference.\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
+		}
 	}
 
+
 	if (argc > 1 &&  strcmp(argv[1], "add") == 0) {
+		/*On ajoute tous les fichiers donnes en parametres a la zone de preparation*/
 		if (argc > 2) {
 			for (int i = 2; i < argc; i ++) {
 				myGitAdd(argv[i]);
 			}
+
+			printf("Les fichiers ont ete ajoutes a la zone de preparation avec succes !\n");
+
+			return 0;
 		}
 		else {
-			printf("Veuillez renseigner le(s) fichier(s) a ajouter.\n");
+			fprintf(stderr, "Veuillez renseigner le(s) fichier(s) a ajouter.\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
 		}
 	}
+
 
 	if (argc > 1 &&  strcmp(argv[1], "clear-add") == 0) {
-		system("rm .add");
+		/*On supprime le fichier si il existe*/
+		if (file_exists(".add") == 1) {
+			system("rm .add");
+
+			printf("La zone de preparation a ete videe avec succes !\n");
+
+			return 0;
+		} else {
+			fprintf(stderr, "La zone de preparation n'existe pas !\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
+		}
 	}
+
 
 	if (argc > 1 && strcmp(argv[1], "add-list") ==0) {
-		printf("Zone de preparation : \n");
+		/*On affiche le contenu de la zone de preparation*/
 		if (file_exists(".add")) {
+			/*On recupere le WorkTree associe a la zone de preparation*/
 			WorkTree* wt = ftwt(".add");
+
+			/*On recupere sa representation en chaine de caracteres (= contenu du fichier de .add)*/
 			char* swt = wtts(wt);
-			printf("%s\n", swt);
+			printf("Zone de preparation :\n%s\n", swt);
+
 			freeWorkTree(wt);
 			free(swt);
+
+			return 0;
+		} else {
+			fprintf(stderr, "La zone de preparation n'existe pas !\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
 		}
 	}
+
 
 	if (argc > 1 && strcmp(argv[1], "commit") == 0) {
-			if (argc > 4 && strcmp(argv[3], "-m") == 0) {
-				if (branchExists(argv[2]) != 1) {
-					fprintf(stderr, "La branche %s n'est pas valide !\n", argv[2]);
-				} else {
-					myGitCommit(argv[2], argv[4]);
-				}
-			} else if (argc > 2) {
-				if (branchExists(argv[2]) != 1) {
-					fprintf(stderr, "La branche %s n'est pas valide !\n", argv[2]);
-				} else {
-					myGitCommit(argv[2], NULL);
-				}
+		/*On verifie la presence d'un message pour le commit*/
+		if (argc > 4 && strcmp(argv[3], "-m") == 0) {
+			/*Si la branche renseignee n'existe pas*/
+			if (branchExists(argv[2]) != 1) {
+				fprintf(stderr, "La branche %s n'est pas valide !\nUtilisez './myGit help' pour plus d'informations !\n", argv[2]);
+
+				return 1;
 			} else {
-			printf("Veuillez renseigner le nom du commit [et le message].\n");
+				myGitCommit(argv[2], argv[4]);
+
+				printf("Le commit sur la branche %s s'est bien passe !\n", argv[2]);
+
+				return 0;
 			}
+		} else if (argc > 2) {
+			/*Si la branche renseignee n'existe pas*/
+			if (branchExists(argv[2]) != 1) {
+				fprintf(stderr, "La branche %s n'est pas valide !\nUtilisez './myGit help' pour plus d'informations !\n", argv[2]);
+
+				return 1;
+			} else {
+				myGitCommit(argv[2], NULL);
+
+				printf("Le commit sur la branche %s s'est bien passe !\n", argv[2]);
+
+				return 0;
+			}
+		} else {
+			fprintf(stderr, "Veuillez renseigner le nom du commit [et le message].\nUtilisez './myGit help' pour plus d'informations !\n");
+			
+			return 1;
+		}
 	}
+
 
 	if (argc > 1 && strcmp(argv[1], "get-current-branch") == 0) {
+		/*On recupere le contenu du fichier .current_branch*/
 		char* branch = getCurrentBranch();
 		if (branch == NULL) {
-			printf("Erreur lors de l'ouverture du fichier current_branch !\n");
+			fprintf(stderr, "Le fichier .current_branch n'existe pas !\nUtilisez './myGit help' pour plus d'informations !\n");
+
+			return 1;
 		} else {
-			printf("%s\n", branch);
+			printf("La branche courante est %s\n", branch);
+
 			free(branch);
+
+			return 0;
 		}
 	}
+
 
 	if (argc > 1 && strcmp(argv[1], "branch") == 0) {
+		/*On verifie la presence d'un nom de branche*/
 		if (argc >2) {
-			if (!branchExists(argv[2])) {
-				createBranch(argv[2]);
-			}
-			else {
-				printf("La branche existe deja.\n");
-			}
-		}
-	}
-
-	if (argc > 1 && strcmp(argv[1], "branch-print") == 0) {
-		if (argc > 2) {
+			/*On verifie que ce nom est valide*/
 			if (branchExists(argv[2]) == 0) {
-				printf("La branche n'existe pas.\n");
+				/*On creer la branche*/
+				createBranch(argv[2]);
+
+				printf("La branche %s a ete creee avec succes !\n", argv[2]);
+
+				return 0;
 			}
 			else {
-				printBranch(argv[2]);
+				fprintf(stderr, "La branche existe deja.\nUtilisez './myGit help' pour plus d'informations !\n");
+
+				return 1;
 			}
 		} else {
-			printf("Veuillez renseigner le nom de la branche.\n");
+			fprintf(stderr, "Veuillez preciser le nom de la branche a creer !\nUtilisez './myGit help' pour plus d'informations !\n");
+
+			return 1;
 		}
 	}
+
+
+	if (argc > 1 && strcmp(argv[1], "branch-print") == 0) {
+		/*On verifie la presence d'un nom de branche*/
+		if (argc > 2) {
+			/*On verifie que ce nom soit valide*/
+			if (branchExists(argv[2]) == 0) {
+				fprintf(stderr, "La branche n'existe pas !\nUtilisez './myGit help' pour plus d'informations !\n");
+
+				return 1;
+			}
+			else {
+				printf("Branche %s\n", argv[2]);
+				printBranch(argv[2]);
+
+				return 0;
+			}
+		} else {
+			fprintf(stderr, "Veuillez renseigner le nom de la branche.\nUtilisez './myGit help' pour plus d'informations !\n");
+
+			return 1;
+		}
+	}
+
 
 	if (argc > 1 && strcmp(argv[1], "checkout-branch") == 0) {
+		/*On verifie la presence d'un nom de branche valide*/
 		if (argc > 2 && branchExists(argv[2]) == 1) {
 			myGitCheckoutBranch(argv[2]);
+
+			return 0;
 		}
 		else {
-			printf("Veuillez renseigner le nom d'une branche existante.\n");
+			fprintf(stderr, "Veuillez renseigner le nom d'une branche existante.\nUtilisez './myGit help' pour plus d'informations !\n");
+
+			return 1;
 		}
 	}
+
 
 	if (argc > 1 && strcmp(argv[1], "checkout-commit") == 0) {
+		/*On verifie la presence d'un parametre*/
 		if (argc > 2) {
+			/*La fonction fait le traitement toute seule*/
 			myGitCheckoutCommit(argv[2]);
+
+			return 0;
 		}
 		else {
-			printf("Veuillez renseigner le nom du commit.\n");
+			fprintf(stderr, "Veuillez renseigner le nom du commit.\nUtilisez './myGit help' pour plus d'informations !\n");
+
+			return 1;
 		}
 	}
 
+
 	if (argc > 1 && strcmp(argv[1], "merge") == 0) {
+		/*On verifie la presence d'un parametre*/
 		if (argc > 2) {
+			/*On verifie que ce parametre correspond a une branche valide*/
 			if (branchExists(argv[2]) != 1) {
 				fprintf(stderr, "La branche %s n'existe pas !\n", argv[2]);
 				return 1;
 			}
 
+			/*On verifie que la branche ne soit pas la meme que la branche courante*/
 			char* current = getCurrentBranch();
 			if (strcmp(argv[2], current) == 0) {
 				printf("%s est deja la branche courante, il n'y a rien a fusionner !\n", argv[2]);
@@ -162,6 +302,7 @@ int main(int argc, char* argv[]) {
 				return 0;
 			}
 
+			/*On tente d'effectuer la fusion et on recupere la liste des conflits si il y a des collisions*/
 			List* conflicts;
 			if (argc > 3) {
 				conflicts = merge(argv[2], argv[3]);
@@ -256,6 +397,7 @@ int main(int argc, char* argv[]) {
 						break;
 
 					case 4:
+						/*Sortie du programme*/
 						sortie = 1;
 						break;
 
@@ -264,17 +406,30 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
+			/*Liberation des ressources*/
 			free(current);
 			freeList(conflicts);
 			if (liste1 != NULL)
 				freeList(liste1);
 			if (liste2 != NULL)
 				freeList(liste2);
+
+			return 0;
 		} else {
-			fprintf(stderr, "Usage : ./myGit merge <nom_branche_distante> [message]\n");
+			fprintf(stderr, "Usage : ./myGit merge <nom_branche_distante> [message]\nUtilisez './myGit help' pour plus d'informations !\n");
+			
 			return 1;
 		}
 	}
+
+
+	if (argc > 1 && strcmp(argv[1], "help") == 0) {
+		printf("A FAIRE EN SPEED !\n");
+		
+		return 0;
+	}
+
+	printf("Utilisez './myGit help' pour avoir des informations sur comment utiliser le programme !\n");
 
 	return 0;
 }

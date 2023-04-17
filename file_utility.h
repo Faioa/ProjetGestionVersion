@@ -30,6 +30,4 @@ mode_t getChmod(const char* path);
 
 void setMode(mode_t mode, char* path);
 
-char* getContent(char* path); 
-
 #endif
