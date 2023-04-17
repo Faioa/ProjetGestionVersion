@@ -424,8 +424,31 @@ int main(int argc, char* argv[]) {
 
 
 	if (argc > 1 && strcmp(argv[1], "help") == 0) {
-		printf("A FAIRE EN SPEED !\n");
-		
+		printf("Vous trouverez ci-apres une description complete de chacune des commandes disponibles avec ce programme.\nAssurez-vous de mettre vos fichiers dans le repertoire de l'executable de ce programme avant de tenter de faire des operations dessus !\n\n");
+		printf("  - Initialisation d'un depot local : './myGit init'\n\n");
+		printf("  - Ajouter des fichiers a la zone de preparation : './myGit add <nom_fichier1,...>'\n");
+		printf("Ici, nom_fichier1 designe le chemin vers un fichier present dans le repertoire. Vous pouvez ajouter plusieurs fichiers en separant leur chemin avec des espaces.\n\n");
+		printf("  - Vider la zone de préparation : './myGit clear-add'\n\n");
+		printf("  - Lister tous les fichiers de la zone de préparation : './myGit add-list'\n\n");
+		printf("  - Commit les fichiers de la zone de préparation : './myGit commit <nom_de_la_branche> [message_du_commit]'\n");
+		printf("Ici, nom_de_la_branche designe le nom d'une branche existante du depot local, et message_du_commit designe un message optionnel. Il est conseillé d'entourer le message avec des guillemets (\"\") ou de remplacer les espaces par des underscore (_), sinon seul le premier mot sera considere.\n\n");
+		printf("  - Lister toutes les branches du depot local : './myGit refs-list'\n\n");
+		printf("  - Supprimer une branche : './myGit delete-ref <nom_de_la_branche>'\n");
+		printf("Ici, nom_de_la_branche doit designe le nom d'une branche existante du depot local.\n\n");
+		printf("  - Creer une nouvelle branche au depot local : './myGit branch <nom_de_la_branche>'\n");
+		printf("Ici, nom_de_la_branche ne doit pas designer une branche existante du depot local.\n");
+		printf("Alternativement, il est possible d'utiliser la commande './myGit create-refs <nom_de_la_branche> <hash_de_la_reference>'.\n");
+		printf("Dans ce cas, nom_de_la_branche peut designer une branche existante du depot local et hash_de_la_reference doit etre le hash qui sera alors contenu par la branche.\n\n");
+		printf("  - Savoir quelle est la branche courante : './myGit get-current-branch'\n\n");
+		printf("  - Changer de branche : './myGit checkout-branch <nom_de_la_branche>'\n");
+		printf("Ici, nom_de_la_branche doit designer une branche existante du depot local.\n\n");
+		printf("  - Afficher tout l'historique de commits d'une branche : './myGit branch-print <nom_de_la_branche>'\n");
+		printf("Ici, nom_de_la_branche doit designer une branche existante du depot local.\n\n");
+		printf("  - Changer de version (commit) : './myGit checkout-commit <pattern_du_hash_du_commit>'\n");
+		printf("Ici, pattern_du_hash_du_commit doit etre au moins le debut du hash d'un commit de n'importe quelle branche (au plus, tout le hash).\n\n");
+		printf("  - Fusionner deux branches : './myGit merge <nom_de_la_branche_distante>'\n");
+		printf("Ici, nom_de_la_branche_distante doit designe une branche existante du depot local et une branche differente de la branche courante.\nSi le nom_de_la_branche_distante est correct la fusion se fait entre la branche courante et la branche qu'il designe.\n\n");
+		printf("Merci d'avoir utilise notre programme !\n");
 		return 0;
 	}
 
