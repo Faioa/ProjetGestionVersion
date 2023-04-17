@@ -172,79 +172,93 @@ int main(int argc, char* argv[]) {
 				free(current);
 				return 0;
 			}
-			afficheList(conflicts);
+
+			/*On s'occupe des collisions*/
 			int sortie = 0;
-			int choix = 0;
-			List* liste1;
-			List* liste2;
+			int choix_collisions = 0;
+			List* liste1 = NULL;
+			List* liste2 = NULL;
 			while (sortie != 1) {
 				printf("Il y a des collisions ! Veuillez choisir une façon de les gerer :\n");
 				printf("1 - Garder les fichiers de la branche courante %s\n", current);
 				printf("2 - Garder les fichiers de la branche distante %s\n", argv[2]);
 				printf("3 - Resoudre les conflits manuellement\n");
 				printf("4 - Quitter le programme\n");
-				scanf(" %d", &choix);
+				scanf(" %d", &choix_collisions);
 
-				switch (choix) {
+				switch (choix_collisions) {
 					case 1:
+						/*On creer le Commit de suppression pour la branche distante*/
 						createDeletionCommit(argv[2], conflicts, "Suppression pour merge");
+
+						/*On fait la fusion*/
 						if (argc > 3)
 							merge(argv[2], argv[3]);
 						else
 							merge(argv[2], NULL);
-						printf("La fusion s'est bien passee !\n");
+
 						sortie = 1;
 						break;
 
 					case 2:
-						myGitCheckoutBranch(argv[2]);
+						/*On creer le Commit de suppression pour la branche courante*/
 						createDeletionCommit(current, conflicts, "Suppression pour merge");
-						if (argc > 3)
-							merge(current, argv[3]);
-						else
-							merge(current, NULL);
-						printf("La fusion s'est bien passee !\n");
-						sortie = 1;
-						break;
-
-					case 3:
-						liste1 = initList();
-						liste2 = initList();
-						int choix2;
-						printf("Veuillez selectionner une option pour chaque conflit :\n");
-						printf("1 - Garder le fichier sur la branche courante %s\n", current);
-						printf("2 - Garder le fichier sur la branche distante %s\n", argv[2]);
-						for (Cell *cell = *conflicts; cell != NULL; cell = cell -> next) {
-							choix2 = 0;
-							printf("Conflit : %s\n", cell -> data);
-							while (1) {
-								scanf(" %d", &choix2);
-								if (choix2 == 1 || choix2 == 2) {
-									break;
-								}
-								printf("Veuillez rentrer une valeur correcte !\n");
-							}
-							if (choix2 == 1)
-								insertFirst(liste1, cell);
-							else
-								insertFirst(liste2, cell);
-						}
-
-						createDeletionCommit(argv[2], liste1, "Suppression pour merge");
-						myGitCheckoutBranch(argv[2]);
-						createDeletionCommit(current, liste2, "Suppression pour merge");
-						myGitCheckoutBranch(current);
 
 						if (argc > 3)
 							merge(argv[2], argv[3]);
 						else
 							merge(argv[2], NULL);
+
+						sortie = 1;
+						break;
+
+					case 3:
+						/*On cherche a savoir quel fichier garder sur quelle branche*/
+						liste1 = initList();
+						liste2 = initList();
+						int choix_branche;
+						printf("Veuillez selectionner une option pour chaque conflit :\n");
+						printf("1 - Garder le fichier sur la branche courante %s\n", current);
+						printf("2 - Garder le fichier sur la branche distante %s\n", argv[2]);
+
+						/*Parcours de la liste des conflits*/
+						for (Cell *cell = *conflicts; cell != NULL; cell = cell -> next) {
+							choix_branche = 0;
+							int sortie_branche = 0;
+							printf("Conflit : %s\n", cell -> data);
+							/*Tant que la valeur rentree n'est pas bonne on demande une option a l'utilisateur (attention a autre chose qu'un int -> boucle infinie)*/
+							while (sortie_branche != 1) {
+								scanf(" %d", &choix_branche);
+								if (choix_branche == 1 || choix_branche == 2)
+									sortie_branche = 1;
+								else
+									printf("Veuillez rentrer une valeur correcte !\n");
+							}
+
+							/*liste1 pour garder sur la branche courante*/
+							if (choix_branche == 1)
+								insertFirst(liste1, buildCell(cell->data));
+							/*liste2 pour garder sur la branche distante*/
+							else
+								insertFirst(liste2, buildCell(cell->data));
+						}
+
+						/*Creation des Commits de suppression (tous les elements qui ne sont pas dans la liste donnee en parametre sont gardes)*/
+						createDeletionCommit(argv[2], liste1, "Suppression pour merge");
+						createDeletionCommit(current, liste2, "Suppression pour merge");
+
+						if (argc > 3)
+							merge(argv[2], argv[3]);
+						else
+							merge(argv[2], NULL);
+
 						sortie = 1;
 						break;
 
 					case 4:
 						sortie = 1;
 						break;
+
 					default:
 						break;
 				}
@@ -252,8 +266,10 @@ int main(int argc, char* argv[]) {
 
 			free(current);
 			freeList(conflicts);
-			free(liste1);
-			free(liste2);
+			if (liste1 != NULL)
+				freeList(liste1);
+			if (liste2 != NULL)
+				freeList(liste2);
 		} else {
 			fprintf(stderr, "Usage : ./myGit merge <nom_branche_distante> [message]\n");
 			return 1;
