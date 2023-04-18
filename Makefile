@@ -46,9 +46,5 @@ check.o: check.c check.h
 fusion.o: fusion.c fusion.h
 	$(CC) -c fusion.c $(CFLAGS)
 
-#Ou plus simplement
-#%.o:%.c %.h
-#	$(CC)  $(GCC_FLAGS) -c  $<
-
 clean:
 	rm -f *.o *~ $(PROGRAMS)
