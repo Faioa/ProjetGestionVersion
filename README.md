@@ -39,4 +39,5 @@ Vous trouverez ici une rapide description de ce qu'il est possible de faire.
 * Vous pouvez obtenir plus de renseignements sur les commandes et leur utilisation avec la commande '**_./myGit help_**'.
 
 
-**Dernier avertissement ! A cause du choix d'implémentation du projet, il faut veuiller à ne pas ajouter les instantanes et leur repertoires dans la zone de preparation ou bien le depot local sera ruiné lors d'un commit/merge.**
+**Dernier avertissement ! A cause du choix d'implémentation du projet, il faut veiller à ne pas ajouter les instantanes et leur repertoires dans la zone de preparation ou bien le depot local sera ruiné lors d'un commit/merge.  
+De plus, si les fichiers sont placés dans des sous-répertoires, en cas de conflits lors d'un merge, vous n'aurez que la possibilité de choisir entre les versions des répertoires en entiers (les fichiers qu'ils contiennent ne seront pas pris en compte individuellement). Cela est aussi causé par l'implémentation actuelle des différentes fonctions (le fait de comparer les hashs pour comparer les versions notamment).**
