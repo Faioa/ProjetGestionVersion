@@ -56,48 +56,66 @@ List* merge(char* remote_branch, char* message){
     char* current_branch = getCurrentBranch();
     char* current_hash = getRef(current_branch);
     char* remote_hash = getRef(remote_branch);
+    WorkTree* wt1 = NULL;
+    WorkTree* wt2 = NULL;
+    if (current_hash == NULL) {
+        if (remote_hash == NULL) {
+            printf("Il n'y a rien a fusionner, les deux branches %s et %s sont vides !\n", current_branch, remote_branch);
+            free(current_branch);
+            return NULL;
+        }
+        wt1 = initWorkTree();
+        current_hash = strdup("(null)");
+    }
+
+    if (remote_hash == NULL) {
+        wt2 = initWorkTree();
+        remote_hash = strdup("(null)");
+    }
+    if (wt1 == NULL && wt2 == NULL) {
+        /*Recuperation des Commits*/
+        char* current_path_commit = hashToPathCommit(current_hash);
+        Commit* current_commit = ftc(current_path_commit);
+        free(current_path_commit);
+
+        char* remote_path_commit = hashToPathCommit(remote_hash);
+        Commit* remote_commit = ftc(remote_path_commit);  
+        free(remote_path_commit);
 
 
-    /*Recuperation des Commits*/
-    char* current_path_commit = hashToPathCommit(current_hash);
-    Commit* current_commit = ftc(current_path_commit);
-    free(current_path_commit);
+        /*Recuperation des hashs des WorkTrees*/
+        char* current_wt_hash = commitGet(current_commit, "tree");
 
-    char* remote_path_commit = hashToPathCommit(remote_hash);
-    Commit* remote_commit = ftc(remote_path_commit);  
-    free(remote_path_commit);
+        char* remote_wt_hash = commitGet(remote_commit, "tree");
 
 
-    /*Recuperation des hashs des WorkTrees*/
-    char* current_wt_hash = commitGet(current_commit, "tree");
+        /*Recuperation des chemins vers les WorkTrees et restoration de ces derniers*/
+        char* current_wt_path = hashToPath(current_wt_hash);
+        char buffer1[500];
+        memset(buffer1, 0, 500);
+        sprintf(buffer1,"%s.t", current_wt_path);
+        wt1 = ftwt(buffer1);
+        free(current_wt_path);
+        freeCommit(current_commit);
 
-    char* remote_wt_hash = commitGet(remote_commit, "tree");
-
-
-    /*Recuperation des chemins vers les WorkTrees et restoration de ces derniers*/
-    char* current_wt_path = hashToPath(current_wt_hash);
-    char buffer1[500];
-    memset(buffer1, 0, 500);
-    sprintf(buffer1,"%s.t", current_wt_path);
-    WorkTree* wt1 = ftwt(buffer1);
-    free(current_wt_path);
-    freeCommit(current_commit);
-
-    char* remote_wt_path = hashToPath(remote_wt_hash);
-    char buffer2[500];
-    memset(buffer2, 0, 500);
-    sprintf(buffer2,"%s.t", remote_wt_path);
-    WorkTree* wt2 = ftwt(buffer2);
-    free(remote_wt_path);
-    freeCommit(remote_commit);
+        char* remote_wt_path = hashToPath(remote_wt_hash);
+        char buffer2[500];
+        memset(buffer2, 0, 500);
+        sprintf(buffer2,"%s.t", remote_wt_path);
+        wt2 = ftwt(buffer2);
+        free(remote_wt_path);
+        freeCommit(remote_commit);
+    }
 
 
     /*Creation du WorkTree de fusion si il n'y a pas de conflits*/
     List* conflicts = initList();
 
     WorkTree* wt = mergeWorkTrees(wt1, wt2, &conflicts);
-    freeWorkTree(wt1);
-    freeWorkTree(wt2);
+    if (wt != wt1)
+        freeWorkTree(wt1);
+    if (wt2 != wt)
+        freeWorkTree(wt2);
 
     if((*conflicts) == NULL){
         /*Enregistrement instantane du WorkTree de la fusion*/

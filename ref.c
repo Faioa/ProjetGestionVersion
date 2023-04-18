@@ -61,8 +61,13 @@ char* getRef(char* ref_name){
 			break;
 		}
 	}
-	
+
 	fclose(fp);
+
+	if (strlen(result) == 0 || strcmp(result, "(null)") == 0) {
+		free(result);
+		return NULL;
+	}
 	
 	return result;
 }
@@ -115,11 +120,11 @@ void myGitCommit(char* branch_name, char * message){
 	char* content2 = getRef(branch_name);
 	
 	/*On verifie que les hashs ne soit pas vide*/
-	if(content1 != NULL && strlen(content1) == 0) {
+	if(content1 != NULL) {
 		free(content1);
 		content1 = strdup("(null)");
 	}
-	if(content2 != NULL && strlen(content2) == 0) {
+	if(content2 != NULL) {
 		free(content2);
 		content2 = strdup("(null)");
 	}

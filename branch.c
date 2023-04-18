@@ -74,7 +74,10 @@ char *hashToPathCommit(char* hash){
 /*Affiche l'arborescence des commit de la branche*/
 void printBranch(char* branch){
 	/*Recuperation du dernier Commit de la branche*/
-	char * commit_hash=getRef(branch);
+	char * commit_hash = getRef(branch);
+	if (commit_hash == NULL) {
+		return;
+	}
 	char* path = hashToPathCommit(commit_hash);
 	Commit* c=ftc(path);
 

@@ -130,7 +130,6 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 
 		/*On recupere le nom du fichier (sans le chemin) pour etre sur de construire le fichier au bon endroit dans tous les cas*/
 		basename = baseName(wt->tab[i].name);
-
 		if (strcmp("myGit", basename) == 0) {
 			free(basename);
 			continue;
@@ -175,7 +174,7 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 			/*On change son mode*/
 			setMode(chmod, new_path);
 		} else {
-			fprintf(stderr, "Impossible de retrouver les informations de %s, veuillez verifier l'integriter des fichiers du commit !\n", new_path);
+			fprintf(stderr, "Impossible de retrouver les informations de %s, veuillez verifier l'integriter des fichiers du commit !\n", hashPath);
 		}
 
 		free(hashPath);

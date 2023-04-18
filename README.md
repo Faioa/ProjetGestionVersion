@@ -1,10 +1,10 @@
 # ProjetGestionVersion
-Projet de structure de données LU2IN006
+## Projet de structure de données LU2IN006
 
 Tout au long du semestre, nous avons pu implémenter graduellement un programme de gestion de version, à la manière de Git.
 Vous trouverez ici une rapide description de ce qu'il est possible de faire.
 
-# Attention ! Il est important de placer tous les fichiers et les repertoires que vous voulez sauvegarder dans ce répertoire ou le programme ne fonctionnera pas !
+**Attention ! Il est important de placer tous les fichiers et les repertoires que vous voulez sauvegarder dans ce répertoire ou le programme ne fonctionnera pas !**
 
 0 - Déplacez-vous dans le répertoire contenant les fichiers du projet à l'aide de la commande UNIX 'cd'.
 
@@ -37,3 +37,6 @@ Vous trouverez ici une rapide description de ce qu'il est possible de faire.
 14 - Vous pouvez fusionner deux branches avec la commande './myGit merge <nom_de_la_branche_distante>'.
 
 15 - Vous pouvez obtenir plus de renseignements sur les commandes et leur utilisation avec la commande './myGit help'.
+
+
+**Dernier avertissement ! A cause du choix d'implémentation du projet, il faut veuiller à ne pas ajouter les instantanes et leur repertoires dans la zone de preparation ou bien le depot local sera ruiné lors d'un commit/merge.**

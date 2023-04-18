@@ -245,6 +245,9 @@ void ctf(Commit* c, char* file){
 
 /*Retourne un pointeur sur un Commit construit a partir de sa representation contenue dans le fichier dont le chemin est passe en parametre*/
 Commit* ftc(char* file){
+	if (file == NULL || strlen(file) == 0)
+		return NULL;
+	
 	/*Initialisation des variables*/
 	kvp* k = NULL;
 	Commit* c = initCommit();

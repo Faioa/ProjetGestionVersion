@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
 				return 1;
 			}
 			else {
-				printf("Branche %s\n", argv[2]);
+				printf("Branche %s :\n", argv[2]);
 				printBranch(argv[2]);
 
 				return 0;
