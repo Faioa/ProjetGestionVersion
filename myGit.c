@@ -177,8 +177,6 @@ int main(int argc, char* argv[]) {
 			} else {
 				myGitCommit(argv[2], NULL);
 
-				printf("Le commit sur la branche %s s'est bien passe !\n", argv[2]);
-
 				return 0;
 			}
 		} else {
@@ -313,7 +311,7 @@ int main(int argc, char* argv[]) {
 				free(current);
 				return 0;
 			}
-
+			afficheList(conflicts);
 			/*On s'occupe des collisions*/
 			int sortie = 0;
 			int choix_collisions = 0;

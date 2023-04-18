@@ -73,45 +73,34 @@ char *hashToPathCommit(char* hash){
 
 /*Affiche l'arborescence des commit de la branche*/
 void printBranch(char* branch){
-	/*Recuperation du hash du dernier commit de la branche*/
-	char* commit_hash = getRef(branch);
+	/*Recuperation du dernier Commit de la branche*/
+	char * commit_hash=getRef(branch);
+	char* path = hashToPathCommit(commit_hash);
+	Commit* c=ftc(path);
 
-	/*Recuperation du chemin vers le Commit*/
-	char* path_commit = hashToPathCommit(commit_hash);
-
-	/*Reconstruction du Commit*/
-	Commit* c = ftc(path_commit);
-
-	/*Parcours de l'arborescence du Commit a travers son champs 'predecessor'*/
-	while(c != NULL){
+	/*Parcours du Commit avec son champs predecessor*/
+	while( c != NULL ){
 		/*Recuperation du message*/
-		char* c_hash_tmp = commitGet(c, "message");
-
-		/*On print le hash avec le message si il y en avait un*/
-		if (c_hash_tmp != NULL){
-			printf("%s -> %s\n", commit_hash, c_hash_tmp);
-			free(commit_hash);
-			commit_hash = c_hash_tmp;
-		}else{
-			printf("%s\n", commit_hash);
-		}
+		char* message = commitGet(c, "message");
+		printf("%s -> %s\n", commit_hash, message);
 
 		/*Recuperation du predecesseur*/
-		c_hash_tmp = commitGet(c, "predecessor");
-		if(c_hash_tmp != NULL){
-			free(path_commit);
-			path_commit = hashToPathCommit(c_hash_tmp);
-			free(c_hash_tmp);
+		char* pred_hash_tmp = commitGet(c,"predecessor");
+		if(pred_hash_tmp != NULL && strcmp(pred_hash_tmp, "(null)") != 0){
+			free(commit_hash);
+			commit_hash = strdup(pred_hash_tmp);
+			char* path_pred = hashToPathCommit(pred_hash_tmp);
 			freeCommit(c);
-			c = ftc(path_commit);
+			c=ftc(path_pred);
+			free(path_pred);
 		}else{
 			freeCommit(c);
-			c = NULL;
+			c=NULL;
 		}
 	}
 
+	free(path);
 	free(commit_hash);
-	free(path_commit);
 }
 
 /*Retourne la liste contenant tous les commits de la branche*/
@@ -122,21 +111,22 @@ List* branchList(char* branch){
 	/*Recuperation du dernier Commit de la branche*/
 	char * commit_hash=getRef(branch);
 	char* path = hashToPathCommit(commit_hash);
-	Commit * c=ftc(path);
+	Commit* c=ftc(path);
 
 	/*Parcours du Commit avec son champs predecessor*/
 	while( c != NULL ){
 		/*Insertion du hash du Commit actuel*/
 		insertFirst(l, buildCell(commit_hash));
-		free(commit_hash);
 
 		/*Recuperation du predecesseur*/
-		commit_hash = commitGet(c,"predecessor");
-		if(commit_hash != NULL){
-			char* hash = hashToPathCommit(commit_hash);
+		char* pred_hash_tmp = commitGet(c,"predecessor");
+		if(pred_hash_tmp != NULL && strcmp(pred_hash_tmp, "(null)") != 0){
+			free(commit_hash);
+			commit_hash = strdup(pred_hash_tmp);
+			char* path_pred = hashToPathCommit(pred_hash_tmp);
 			freeCommit(c);
-			c=ftc(hash);
-			free(hash);
+			c=ftc(path_pred);
+			free(path_pred);
 		}else{
 			freeCommit(c);
 			c=NULL;
@@ -144,6 +134,7 @@ List* branchList(char* branch){
 	}
 
 	free(path);
+	free(commit_hash);
 
 	return l;
 }

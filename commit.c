@@ -252,7 +252,7 @@ Commit* ftc(char* file){
 
 	FILE* f = fopen(file,"r");
 	if (f == NULL) {
-		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction ftwt !\n", file);
+		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction ftc !\n", file);
 		exit(1);
 	}
 

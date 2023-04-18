@@ -30,13 +30,12 @@ void deleteRef(char* ref_name){
 
 /*Renvoie la chaine de caracteres contenant le hash du dernier commit de la reference passee en parametre*/
 char* getRef(char* ref_name){
-	
 	char*result;
 	
 	/*Recuperation du chemin vers la reference*/
 	char buffer[256];
 	sprintf(buffer,".refs/%s",ref_name);
-	if(file_exists(buffer)==0) {
+	if(file_exists(buffer) == 0) {
 		return NULL;
 	}
 	
@@ -112,19 +111,18 @@ void myGitCommit(char* branch_name, char * message){
 	}
 
 	/*On recupere les hashs des references branch_name et HEAD*/
-	char* content1 = getRef(".refs/HEAD");
-	char* content2 = getRef(buffer);
+	char* content1 = getRef("HEAD");
+	char* content2 = getRef(branch_name);
 	
 	/*On verifie que les deux references precedentes on pointent bien sur le meme commit*/
 	if(content1 != NULL && content2 != NULL && strcmp(content1,content2) != 0){
 		fprintf(stderr,"HEAD doit pointer sur le dernier commit de la branche\n");
-		free(content1);
-		free(content2);
+		if (content1 != NULL)
+			free(content1);
+		if (content2 != NULL)
+			free(content2);
 		return ;
 	}
-
-	free(content1);
-	free(content2);
 	
 	/*On recupere le WorkTree de la zone de preparation*/
 	WorkTree*wt=ftwt(".add");
@@ -142,24 +140,10 @@ void myGitCommit(char* branch_name, char * message){
 
 	free(hash);
 	
-	FILE* fp=fopen(buffer,"r");
-	if (fp == NULL) {
-		fprintf(stderr, "Erreur lors de l'ouverture du fichier %s dans la fonction myGitCommit !\n", branch_name);
-		exit(1);
-	}
-	
-	char result[256];
-	memset(result, 0, 256);
-
-	/*On sauvegarde le commit precedent si il existait*/
-	if(fgets(result,256,fp) != NULL){
-		commitSet(c,"predecessor",result);
-	}
+	commitSet(c,"predecessor",content2);
 	
 	/*On sauvegarde le message du commit si il a ete fournit*/
-	if(message!=NULL){
-		commitSet(c,"message",message);
-	}
+	commitSet(c,"message",message);
 
 	/*On sauvegarde l'instantane du commit*/
 	char *hash_commit=blobCommit(c);
@@ -169,7 +153,10 @@ void myGitCommit(char* branch_name, char * message){
 	createUpdateRef("HEAD",hash_commit);
 
 	/*Liberation des ressources*/
-	fclose(fp);
 	free(hash_commit);
 	freeCommit(c);
+	free(content1);
+	free(content2);
+				
+	printf("Le commit sur la branche %s s'est bien passe !\n", branch_name);
 }

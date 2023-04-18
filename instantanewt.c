@@ -65,6 +65,8 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 		if (is_regular_file(new_path) == 0) {
 			blobFile(new_path);
 			wf -> mode = getChmod(new_path);
+			if (wf -> hash != NULL)
+				free(wf->hash);
 			wf -> hash = sha256file(new_path);
 		}
 

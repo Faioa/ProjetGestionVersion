@@ -35,7 +35,7 @@ WorkTree* initWorkTree(){
 void freeWorkTree(WorkTree* wt) {
 	if (wt == NULL)
 		return;
-	for (int i = wt -> n - 1; i > -1; i--) {
+	for (int i = 0; i < wt -> n; i++) {
 		if (wt -> tab[i].name != NULL) {
 			free(wt -> tab[i].name);
 		}
