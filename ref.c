@@ -114,6 +114,16 @@ void myGitCommit(char* branch_name, char * message){
 	char* content1 = getRef("HEAD");
 	char* content2 = getRef(branch_name);
 	
+	/*On verifie que les hashs ne soit pas vide*/
+	if(content1 != NULL && strlen(content1) == 0) {
+		free(content1);
+		content1 = strdup("(null)");
+	}
+	if(content2 != NULL && strlen(content2) == 0) {
+		free(content2);
+		content2 = strdup("(null)");
+	}
+	
 	/*On verifie que les deux references precedentes on pointent bien sur le meme commit*/
 	if(content1 != NULL && content2 != NULL && strcmp(content1,content2) != 0){
 		fprintf(stderr,"HEAD doit pointer sur le dernier commit de la branche\n");
