@@ -8,13 +8,13 @@ Vous trouverez ici une rapide description de ce qu'il est possible de faire.
 
 0 - Déplacez-vous dans le répertoire contenant les fichiers du projet à l'aide de la commande UNIX 'cd'.
 
-1 - Commencez par compiler le programme avec la commande 'make'.
+1 - Commencez par compiler le programme avec la commande **_'make'_**.
 
-2 - Initialiser le dépot local avec la commande './myGit init'.
+2 - Initialiser le dépot local avec la commande _'./myGit init'_.
 
-3 - Vous devez maintenant ajouter des fichiers à la zone de préparation grace à la commande './myGit add <nom_fichier1,...>'.
+3 - Vous devez maintenant ajouter des fichiers à la zone de préparation grace à la commande **_'./myGit add <nom_fichier1,...>'_**.
 
-4 - Vous pouvez vider la zone de préparation avec la commande './myGit clear-add'.
+4 - Vous pouvez vider la zone de préparation avec la commande _'./myGit clear-add'_.
 
 5 - Vous pouvez lister tous les fichiers de la zone de préparation avec la commande './myGit add-list'.
 
