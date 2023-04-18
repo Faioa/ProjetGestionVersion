@@ -116,7 +116,7 @@ char* saveWorkTree(WorkTree* wt, char* path) {
 	return res;
 }
 
-/*Restore l'arborescence du WorkTree et les fichiers associes*/
+/*Restaure l'arborescence du WorkTree et les fichiers associes*/
 void restoreWorkTree(WorkTree* wt, char* path) {
 	/*Declaration des variables*/
 	char* new_path, *hashPath, *basename;
@@ -159,7 +159,7 @@ void restoreWorkTree(WorkTree* wt, char* path) {
 
 			/*Comme la fonction cp s'occupe deja de creer les repertoires parents d'un fichier lorsqu'ils n'existent pas, on n'a besoin de le creer manuellement ici pour changer le mode.*/
 
-			/*On restore recursivement le WorkTree*/
+			/*On restaure recursivement le WorkTree*/
 			restoreWorkTree(new_wt, new_path);
 
 			/*On change quand meme le mode du repertoire*/

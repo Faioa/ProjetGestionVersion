@@ -1,6 +1,6 @@
 #include "check.h"
 
-/*Restore le commit correspondant au hash donne en parametre*/
+/*Restaure le commit correspondant au hash donne en parametre*/
 void restoreCommit(char *hash_commit){
 
     if (hash_commit == NULL || strlen(hash_commit) == 0) {
@@ -20,7 +20,7 @@ void restoreCommit(char *hash_commit){
     sprintf(buffer,"%s.t", path_commit);
 	WorkTree*wt=ftwt(buffer);
 
-    /*Restoration des fichiers*/
+    /*Restauration des fichiers*/
     restoreWorkTree(wt,".");
 
     /*Liberation des ressources*/
@@ -30,19 +30,19 @@ void restoreCommit(char *hash_commit){
     free(path_commit);
 }
 
-/*Effectue le changement de branche et restore le dernier Commit de la branche*/
+/*Effectue le changement de branche et restaure le dernier Commit de la branche*/
 void myGitCheckoutBranch(char * branch){
     /*Change la branche pointee par .current_branch*/
     FILE*f=fopen(".current_branch","w");
     fprintf(f,"%s",branch);
     fclose(f);
 
-    /*Restore le dernier Commit de la branche*/
+    /*Restaure le dernier Commit de la branche*/
     char* ref = getRef(branch);
     createUpdateRef("HEAD",ref);
     restoreCommit(ref);
 
-    printf("Le changement de branche vers %s et la restoration de son dernier commit s'est effectue avec succes !\n", branch);
+    printf("Le changement de branche vers %s et la restauration de son dernier commit s'est effectue avec succes !\n", branch);
 
     free(ref);
 }
@@ -63,7 +63,7 @@ List* filterList(List * L, char * pattern){
     return result;
 }
 
-/*Restore le commit qui match avec le pattern donne en parametre*/
+/*Restaure le commit qui match avec le pattern donne en parametre*/
 void myGitCheckoutCommit(char * pattern){
     /*Recuperation de tous les commits de toutes les branches*/
     List* l_commit = getAllCommits();

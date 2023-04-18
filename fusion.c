@@ -89,7 +89,7 @@ List* merge(char* remote_branch, char* message){
         char* remote_wt_hash = commitGet(remote_commit, "tree");
 
 
-        /*Recuperation des chemins vers les WorkTrees et restoration de ces derniers*/
+        /*Recuperation des chemins vers les WorkTrees et restauration de ces derniers*/
         char* current_wt_path = hashToPath(current_wt_hash);
         char buffer1[500];
         memset(buffer1, 0, 500);
@@ -144,7 +144,7 @@ List* merge(char* remote_branch, char* message){
         /*Supprimer la reference de la branche passee en parametre*/
         deleteRef(remote_branch);
 
-        /*Restorer le projet correspondant au WorkTree de fusion*/
+        /*Restaurer le projet correspondant au WorkTree de fusion*/
         restoreWorkTree(wt, ".");
 
         printf("La fusion des branches %s et %s vers %s s'est bien passee !\n", current_branch, remote_branch, current_branch);
@@ -180,7 +180,7 @@ void createDeletionCommit(char* branch, List* conflicts, char* message){
     /*Recupérer le fichier contenant la référence(le hash) du commit*/
 	char* commit_hash = getRef(branch);
 
-	/*Recuperation du chemin vers le Commit et restoration*/
+	/*Recuperation du chemin vers le Commit et restauration*/
     char* path_commit_hash = hashToPathCommit(commit_hash);
 	Commit* c = ftc(path_commit_hash);
     free(commit_hash);
